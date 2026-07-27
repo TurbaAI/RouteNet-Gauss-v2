@@ -15,12 +15,14 @@ limitations under the License.
 """
 
 import os
+import pickle
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 
 from models import RouteNetGauss
-from data import load_dataset
+#from data import load_dataset
+
 from utils import prepare_targets_and_mask, load_dataset
 
 from random import seed
@@ -202,7 +204,8 @@ def get_positional_r2(pos: int, name: str) -> callable:
 
 
 # Name of the dataset
-ds_name = "data_mawi_pcaps"
+#ds_name = "data_mawi_pcaps"
+ds_name = "mawi_pcaps"
 # Experiment identifier
 experiment_name = "paper_weights"
 # Target to be predicted
@@ -228,12 +231,18 @@ ds_val = load_dataset(f"{ds_name}/validation").map(
     prepare_targets_and_mask(targets, mask)
 )
 
+# Hey claude please give me some insight about the data!
+# write your code here please
+
+
+###
+print("target:",target)
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0)
 loss = tf.keras.losses.MeanAbsolutePercentageError()
 model = RouteNetGauss(
     output_dim=len(targets),
     mask_field=mask,
-    use_true_trans_pkts=target == "delay",
+    use_trans_delay=target == "delay",
     z_scores=get_z_scores_dict(
         ds_train,
         RouteNetGauss.z_scores_fields,
