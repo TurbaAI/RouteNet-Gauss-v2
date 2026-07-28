@@ -221,8 +221,9 @@ targets = [
 mask = f"flow_has_{target}"
 experiment_path = f"{experiment_name}/{ds_name}/{RouteNetGauss.__name__}/{target}"
 
+ds_train_raw = load_dataset(f"{ds_name}/training")
 ds_train = (
-    load_dataset(f"{ds_name}/training")
+    ds_train_raw
     .map(prepare_targets_and_mask(targets, mask))
     .shuffle(1000, seed=SEED, reshuffle_each_iteration=True)
     .repeat()
@@ -231,12 +232,25 @@ ds_val = load_dataset(f"{ds_name}/validation").map(
     prepare_targets_and_mask(targets, mask)
 )
 
-# Hey claude please give me some insight about the data!
-# write your code here please
+# --- Added by Claude: data-insight visualization only, not part of training ---
+# The block below (and the visualization/ package it calls into) was added by
+# Claude Code purely to give a visual/textual sanity check of the dataset before
+# training starts: it reconstructs the network topology of one training sample
+# and renders it, together with link capacity and queue (buffer_type) info, to
+# visualization/output/<ds_name>/. It reads data only and does not influence the
+# model, the loss, or training in any way. See visualization/README.md for
+# details, or delete this block (and the import) to remove it entirely.
+from visualization import pick_sample, run_sample_deep_dive
 
+# index=None picks a random sample, so each run shows a different topology. Note this
+# uses random.SystemRandom internally, NOT the SEED-ed `random` stream above -- a seeded
+# draw would hand back the same "random" sample every run. Pass an explicit index (e.g.
+# pick_sample(ds_train_raw, index=0)) to reproduce one particular topology.
+sample_x, sample_y, sample_index = pick_sample(ds_train_raw)
+run_sample_deep_dive(sample_x, sample_y, sample_index=sample_index, dataset_name=ds_name)
+# --- End of Claude-added visualization block ---
 
-###
-print("target:",target)
+print("target:", target)
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0)
 loss = tf.keras.losses.MeanAbsolutePercentageError()
 model = RouteNetGauss(
