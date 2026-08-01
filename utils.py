@@ -16,7 +16,10 @@ limitations under the License.
 
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# Default to CPU-only (as the original repo does) but DON'T clobber an explicit choice made
+# by the caller before import — experiment.py / run_experiments.py set CUDA_VISIBLE_DEVICES=0
+# to run on the GPU, and an unconditional "=-1" here would silently force them back to CPU.
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
 
 import tensorflow as tf
 from typing import List

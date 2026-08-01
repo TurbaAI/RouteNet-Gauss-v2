@@ -1,0 +1,98 @@
+[
+  {
+    "dataset": "trex_multiburst",
+    "target": "delay",
+    "seed": 1,
+    "epochs": 300,
+    "epochs_run": 45,
+    "patience": 15,
+    "steps_per_epoch": 500,
+    "backend": "cpu",
+    "train_seconds": 75692.89,
+    "final_train_loss": 7.914785861968994,
+    "final_val_loss": 8.120821952819824,
+    "best_val_loss": 7.066253662109375,
+    "n_test_predictions": 175028,
+    "test_overall": {
+      "mape": 5.074520781636238,
+      "mae_us": 6.702066912112059,
+      "r2": 0.7282364604664073
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 4.848148301243782,
+        "mae_us": 5.968454843241489,
+        "r2": 0.7643302376966887
+      },
+      "p50": {
+        "mape": 5.064843222498894,
+        "mae_us": 6.154240509204101,
+        "r2": 0.7650046987078184
+      },
+      "p90": {
+        "mape": 4.747705161571503,
+        "mae_us": 6.3904712988005485,
+        "r2": 0.6900329121951265
+      },
+      "p95": {
+        "mape": 5.006621778011322,
+        "mae_us": 6.876610314066056,
+        "r2": 0.6807006408067329
+      },
+      "p99": {
+        "mape": 5.705280974507332,
+        "mae_us": 8.120548955048434,
+        "r2": 0.6605801842780892
+      }
+    },
+    "experiment_path": "tf_converged/trex_multiburst/RouteNetGauss/delay/seed_1"
+  },
+  {
+    "dataset": "trex_multiburst",
+    "target": "jitter",
+    "seed": 1,
+    "epochs": 300,
+    "epochs_run": 193,
+    "patience": 15,
+    "steps_per_epoch": 500,
+    "backend": "cpu",
+    "train_seconds": 250497.42,
+    "final_train_loss": 11.150304794311523,
+    "final_val_loss": 11.638433456420898,
+    "best_val_loss": 11.634695053100586,
+    "n_test_predictions": 174242,
+    "test_overall": {
+      "mape": 11.749638617038727,
+      "mae_us": 1.8812467033058056,
+      "r2": 0.8871277072299265
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 10.90240404009819,
+        "mae_us": 0.9813084034249187,
+        "r2": 0.5129133071683966
+      },
+      "p50": {
+        "mape": 13.954626023769379,
+        "mae_us": 1.0226799531665165,
+        "r2": 0.44042085003375264
+      },
+      "p90": {
+        "mape": 11.103558540344238,
+        "mae_us": 1.9735352907446213,
+        "r2": 0.6105507772585126
+      },
+      "p95": {
+        "mape": 10.984042286872864,
+        "mae_us": 2.29706211030134,
+        "r2": 0.6246976292559789
+      },
+      "p99": {
+        "mape": 11.80356964468956,
+        "mae_us": 3.13165082843625,
+        "r2": 0.632748158936697
+      }
+    },
+    "experiment_path": "tf_converged/trex_multiburst/RouteNetGauss/jitter/seed_1"
+  }
+]

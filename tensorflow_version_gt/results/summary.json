@@ -1,0 +1,362 @@
+[
+  {
+    "dataset": "mawi_pcaps",
+    "target": "delay",
+    "seed": 1,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 2040.35,
+    "final_train_loss": 88.0457992553711,
+    "final_val_loss": 87.78245544433594,
+    "n_test_predictions": 247483,
+    "test_overall": {
+      "mape": 87.33583688735962,
+      "mae_us": 243.41577955055982,
+      "r2": -0.15856205594042616
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 83.15699100494385,
+        "mae_us": 120.97540457034484,
+        "r2": -0.2018222939109322
+      },
+      "p50": {
+        "mape": 81.06240630149841,
+        "mae_us": 89.69308692030609,
+        "r2": -0.1334129867526861
+      },
+      "p90": {
+        "mape": 88.99770975112915,
+        "mae_us": 244.02972485404462,
+        "r2": -0.15430935858163686
+      },
+      "p95": {
+        "mape": 90.43723940849304,
+        "mae_us": 313.3101563435048,
+        "r2": -0.19492792315347018
+      },
+      "p99": {
+        "mape": 93.02483201026917,
+        "mae_us": 449.0703868214041,
+        "r2": -0.2659498559123419
+      }
+    },
+    "experiment_path": "tf_baseline/mawi_pcaps/RouteNetGauss/delay/seed_1"
+  },
+  {
+    "dataset": "mawi_pcaps",
+    "target": "delay",
+    "seed": 2,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1946.9,
+    "final_train_loss": 87.45240020751953,
+    "final_val_loss": 87.66069793701172,
+    "n_test_predictions": 247483,
+    "test_overall": {
+      "mape": 87.20521330833435,
+      "mae_us": 243.1524044368416,
+      "r2": -0.15794750087353315
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 83.4978699684143,
+        "mae_us": 121.30278628319502,
+        "r2": -0.20298645900601509
+      },
+      "p50": {
+        "mape": 80.87642788887024,
+        "mae_us": 89.53985525295138,
+        "r2": -0.13291748952049964
+      },
+      "p90": {
+        "mape": 88.61017227172852,
+        "mae_us": 243.48785518668592,
+        "r2": -0.1535975732065602
+      },
+      "p95": {
+        "mape": 90.5538260936737,
+        "mae_us": 313.49994242191315,
+        "r2": -0.1951719739766915
+      },
+      "p99": {
+        "mape": 92.4877941608429,
+        "mae_us": 447.93137931264937,
+        "r2": -0.2645703263911374
+      }
+    },
+    "experiment_path": "tf_baseline/mawi_pcaps/RouteNetGauss/delay/seed_2"
+  },
+  {
+    "dataset": "mawi_pcaps",
+    "target": "jitter",
+    "seed": 1,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1935.91,
+    "final_train_loss": 97.69808197021484,
+    "final_val_loss": 96.95750427246094,
+    "n_test_predictions": 247452,
+    "test_overall": {
+      "mape": 96.81611061096191,
+      "mae_us": 39.27225407096557,
+      "r2": -0.9793706369992894
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 95.31378746032715,
+        "mae_us": 14.423217180592474,
+        "r2": -4.255138715374924
+      },
+      "p50": {
+        "mape": 89.98433947563171,
+        "mae_us": 7.707062650297303,
+        "r2": -2.853391137845891
+      },
+      "p90": {
+        "mape": 99.36637878417969,
+        "mae_us": 37.8936056222301,
+        "r2": -5.228416785519375
+      },
+      "p95": {
+        "mape": 99.4388997554779,
+        "mae_us": 51.205297495471314,
+        "r2": -4.326205978509408
+      },
+      "p99": {
+        "mape": 99.9769926071167,
+        "mae_us": 85.1321019581519,
+        "r2": -2.273844773176125
+      }
+    },
+    "experiment_path": "tf_baseline/mawi_pcaps/RouteNetGauss/jitter/seed_1"
+  },
+  {
+    "dataset": "mawi_pcaps",
+    "target": "jitter",
+    "seed": 2,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 2010.02,
+    "final_train_loss": 95.47683715820312,
+    "final_val_loss": 94.20834350585938,
+    "n_test_predictions": 247452,
+    "test_overall": {
+      "mape": 94.01715397834778,
+      "mae_us": 38.55112663586624,
+      "r2": -0.9312263263190148
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 91.87391996383667,
+        "mae_us": 13.96043626300525,
+        "r2": -3.974207509160342
+      },
+      "p50": {
+        "mape": 85.14065742492676,
+        "mae_us": 7.377067049674224,
+        "r2": -2.5988287795413965
+      },
+      "p90": {
+        "mape": 96.53104543685913,
+        "mae_us": 36.90248922794126,
+        "r2": -4.947172947963133
+      },
+      "p95": {
+        "mape": 98.4104871749878,
+        "mae_us": 50.716393161565065,
+        "r2": -4.240474644011652
+      },
+      "p99": {
+        "mape": 98.1296956539154,
+        "mae_us": 83.79920473089442,
+        "r2": -2.200442518369383
+      }
+    },
+    "experiment_path": "tf_baseline/mawi_pcaps/RouteNetGauss/jitter/seed_2"
+  },
+  {
+    "dataset": "trex_multiburst",
+    "target": "delay",
+    "seed": 1,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1571.9,
+    "final_train_loss": 110.46895599365234,
+    "final_val_loss": 109.84661102294922,
+    "n_test_predictions": 175028,
+    "test_overall": {
+      "mape": 111.11534833908081,
+      "mae_us": 150.06113972049206,
+      "r2": -32.63011829463833
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 122.54276275634766,
+        "mae_us": 155.4353948449716,
+        "r2": -41.751360914696704
+      },
+      "p50": {
+        "mape": 123.63334894180298,
+        "mae_us": 155.52903641946614,
+        "r2": -42.10325696487467
+      },
+      "p90": {
+        "mape": 108.15565586090088,
+        "mae_us": 148.82277173455805,
+        "r2": -33.213407498324216
+      },
+      "p95": {
+        "mape": 104.21204566955566,
+        "mae_us": 147.15828001499176,
+        "r2": -31.765578247356892
+      },
+      "p99": {
+        "mape": 97.03295826911926,
+        "mae_us": 143.36015738081187,
+        "r2": -28.981462886613254
+      }
+    },
+    "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/delay/seed_1"
+  },
+  {
+    "dataset": "trex_multiburst",
+    "target": "delay",
+    "seed": 2,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1609.87,
+    "final_train_loss": 110.0555648803711,
+    "final_val_loss": 110.16828155517578,
+    "n_test_predictions": 175028,
+    "test_overall": {
+      "mape": 111.46504878997803,
+      "mae_us": 150.55123367346823,
+      "r2": -32.838252059658075
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 122.71584272384644,
+        "mae_us": 155.65763169433922,
+        "r2": -41.86254979221645
+      },
+      "p50": {
+        "mape": 124.05604124069214,
+        "mae_us": 156.06744273100048,
+        "r2": -42.3741801022458
+      },
+      "p90": {
+        "mape": 108.59770774841309,
+        "mae_us": 149.44555005058646,
+        "r2": -33.48711159105033
+      },
+      "p95": {
+        "mape": 104.37817573547363,
+        "mae_us": 147.3988959332928,
+        "r2": -31.869157415405084
+      },
+      "p99": {
+        "mape": 97.57745862007141,
+        "mae_us": 144.1867061657831,
+        "r2": -29.32573734418046
+      }
+    },
+    "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/delay/seed_2"
+  },
+  {
+    "dataset": "trex_multiburst",
+    "target": "jitter",
+    "seed": 1,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1640.35,
+    "final_train_loss": 94.56350708007812,
+    "final_val_loss": 92.91437530517578,
+    "n_test_predictions": 174242,
+    "test_overall": {
+      "mape": 92.87832379341125,
+      "mae_us": 16.4632892847294,
+      "r2": -2.928305905526873
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 84.201580286026,
+        "mae_us": 7.592630026920233,
+        "r2": -8.522108252761477
+      },
+      "p50": {
+        "mape": 89.04377818107605,
+        "mae_us": 6.632417807850288,
+        "r2": -7.142296556491125
+      },
+      "p90": {
+        "mape": 95.88378667831421,
+        "mae_us": 17.847169146989472,
+        "r2": -12.383803043026216
+      },
+      "p95": {
+        "mape": 96.3349997997284,
+        "mae_us": 21.47072518710047,
+        "r2": -12.854102208634393
+      },
+      "p99": {
+        "mape": 98.92755150794983,
+        "mae_us": 28.773501981049776,
+        "r2": -13.318495824548815
+      }
+    },
+    "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/jitter/seed_1"
+  },
+  {
+    "dataset": "trex_multiburst",
+    "target": "jitter",
+    "seed": 2,
+    "epochs": 5,
+    "steps_per_epoch": 50,
+    "backend": "cpu",
+    "train_seconds": 1598.19,
+    "final_train_loss": 92.7388687133789,
+    "final_val_loss": 91.07870483398438,
+    "n_test_predictions": 174242,
+    "test_overall": {
+      "mape": 91.04993343353271,
+      "mae_us": 16.08221464266535,
+      "r2": -2.730475515155505
+    },
+    "test_per_percentile": {
+      "avg": {
+        "mape": 87.65876889228821,
+        "mae_us": 7.890864253567997,
+        "r2": -9.216815746145468
+      },
+      "p50": {
+        "mape": 84.386146068573,
+        "mae_us": 6.310336630122038,
+        "r2": -6.454797945350037
+      },
+      "p90": {
+        "mape": 92.34893918037415,
+        "mae_us": 17.20606815069914,
+        "r2": -11.495305070816164
+      },
+      "p95": {
+        "mape": 96.14684581756592,
+        "mae_us": 21.429801563499495,
+        "r2": -12.804289493054744
+      },
+      "p99": {
+        "mape": 94.7089672088623,
+        "mae_us": 27.574018531595357,
+        "r2": -12.212923272782284
+      }
+    },
+    "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/jitter/seed_2"
+  }
+]

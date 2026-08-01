@@ -1,0 +1,45 @@
+{
+  "dataset": "trex_multiburst",
+  "target": "jitter",
+  "seed": 1,
+  "epochs": 5,
+  "steps_per_epoch": 50,
+  "backend": "cpu",
+  "train_seconds": 1640.35,
+  "final_train_loss": 94.56350708007812,
+  "final_val_loss": 92.91437530517578,
+  "n_test_predictions": 174242,
+  "test_overall": {
+    "mape": 92.87832379341125,
+    "mae_us": 16.4632892847294,
+    "r2": -2.928305905526873
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 84.201580286026,
+      "mae_us": 7.592630026920233,
+      "r2": -8.522108252761477
+    },
+    "p50": {
+      "mape": 89.04377818107605,
+      "mae_us": 6.632417807850288,
+      "r2": -7.142296556491125
+    },
+    "p90": {
+      "mape": 95.88378667831421,
+      "mae_us": 17.847169146989472,
+      "r2": -12.383803043026216
+    },
+    "p95": {
+      "mape": 96.3349997997284,
+      "mae_us": 21.47072518710047,
+      "r2": -12.854102208634393
+    },
+    "p99": {
+      "mape": 98.92755150794983,
+      "mae_us": 28.773501981049776,
+      "r2": -13.318495824548815
+    }
+  },
+  "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/jitter/seed_1"
+}

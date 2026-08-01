@@ -1,0 +1,45 @@
+{
+  "dataset": "trex_multiburst",
+  "target": "delay",
+  "seed": 2,
+  "epochs": 5,
+  "steps_per_epoch": 50,
+  "backend": "cpu",
+  "train_seconds": 1609.87,
+  "final_train_loss": 110.0555648803711,
+  "final_val_loss": 110.16828155517578,
+  "n_test_predictions": 175028,
+  "test_overall": {
+    "mape": 111.46504878997803,
+    "mae_us": 150.55123367346823,
+    "r2": -32.838252059658075
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 122.71584272384644,
+      "mae_us": 155.65763169433922,
+      "r2": -41.86254979221645
+    },
+    "p50": {
+      "mape": 124.05604124069214,
+      "mae_us": 156.06744273100048,
+      "r2": -42.3741801022458
+    },
+    "p90": {
+      "mape": 108.59770774841309,
+      "mae_us": 149.44555005058646,
+      "r2": -33.48711159105033
+    },
+    "p95": {
+      "mape": 104.37817573547363,
+      "mae_us": 147.3988959332928,
+      "r2": -31.869157415405084
+    },
+    "p99": {
+      "mape": 97.57745862007141,
+      "mae_us": 144.1867061657831,
+      "r2": -29.32573734418046
+    }
+  },
+  "experiment_path": "tf_baseline/trex_multiburst/RouteNetGauss/delay/seed_2"
+}

@@ -60,3 +60,15 @@ visualization/output/
 
 # TensorBoard training logs
 tensorboard/
+
+# Job-matrix outputs (run_experiments.py / experiment.py) — regenerable, not source.
+# Anchored to repo root with a leading slash so these do NOT also ignore the snapshotted
+# copies under tensorflow_version_gt/ (which are the tracked ground truth).
+/results/
+/ckpt/tf_baseline/
+/normalization/tf_baseline/
+/ckpt/tf_converged/
+/normalization/tf_converged/
+
+# Local Weights & Biases run logs
+/wandb/
