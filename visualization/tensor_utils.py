@@ -24,6 +24,9 @@ def to_plain(value):
     Detection is duck-typed (``to_list`` before ``numpy``) so this function has no
     hard import-time dependency on ``tensorflow`` and works on plain stand-ins
     (lists, NumPy arrays, Python scalars) unchanged.
+
+    PyTorch: works unchanged — ``torch.Tensor`` has ``.numpy()`` and
+    ``torch_ragged.Ragged`` has ``.to_list()``; string fields arrive as plain lists.
     """
     if hasattr(value, "to_list"):
         return value.to_list()

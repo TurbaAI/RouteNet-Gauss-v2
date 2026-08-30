@@ -1,0 +1,68 @@
+{
+  "dataset": "trex_multiburst",
+  "target": "delay",
+  "seed": 2,
+  "epochs": 5,
+  "steps_per_epoch": 50,
+  "shuffle_buffer": 200,
+  "use_wandb": false,
+  "train_seconds": 1582.5,
+  "z_match": true,
+  "checkpoints": {
+    "01": {
+      "replay_name": "01-110.4420",
+      "gt_name": "01-110.4420",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "02": {
+      "replay_name": "02-110.4361",
+      "gt_name": "02-110.4361",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "03": {
+      "replay_name": "03-110.4124",
+      "gt_name": "03-110.4124",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "04": {
+      "replay_name": "04-110.3315",
+      "gt_name": "04-110.3315",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "05": {
+      "replay_name": "05-110.1683",
+      "gt_name": "05-110.1683",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    }
+  },
+  "history_identical_text": true,
+  "test_predictions_bit_identical": true,
+  "test_targets_bit_identical": true,
+  "fed_order_matches_sample_order_prefix": true,
+  "all_checks_passed": true
+}

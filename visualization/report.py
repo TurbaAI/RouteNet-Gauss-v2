@@ -24,8 +24,9 @@ def pick_sample(ds, index: int = None, unknown_size_guess: int = 256) -> tuple:
     Parameters
     ----------
     ds
-        A ``tf.data.Dataset`` of ``(features, label)`` pairs, as returned by
-        ``utils.load_dataset`` (before any ``.map(prepare_targets_and_mask(...))``).
+        A ``tf.data.Dataset`` (TF) / ``utils.ListDataset`` (PyTorch) of ``(features, label)``
+        pairs, as returned by ``utils.load_dataset`` (before any
+        ``.map(prepare_targets_and_mask(...))``).
     index : int, optional
         Position to take. ``None`` (the default) picks uniformly at random, so each
         run shows a different topology. Pass an int to reproduce a specific one.
@@ -45,10 +46,13 @@ def pick_sample(ds, index: int = None, unknown_size_guess: int = 256) -> tuple:
     # Imported lazily on purpose: this package keeps TensorFlow confined to
     # tensor_utils' duck-typed conversions, so the rest of it (and its tests) can be
     # exercised without TensorFlow installed.
-    import tensorflow as tf
+    # PyTorch: `ds` is now a utils.ListDataset, which exposes the same cardinality()/skip()/
+    # take() calls, so no framework import is needed at all.
+    #TF: import tensorflow as tf
 
     rng = random.SystemRandom()
-    total = int(tf.data.experimental.cardinality(ds))
+    #TF: total = int(tf.data.experimental.cardinality(ds))
+    total = int(ds.cardinality())
 
     if index is None:
         # cardinality returns negative sentinels for unknown/infinite datasets

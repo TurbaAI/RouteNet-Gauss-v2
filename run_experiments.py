@@ -26,6 +26,15 @@ limitations under the License.
 #
 # Usage:  python run_experiments.py [--experiment-name tf_baseline] [--epochs 5]
 #                                   [--steps 50] [--use-wandb] [--force-cpu]
+#
+# PyTorch translation (TF lines kept as `#TF:` comments). Same matrix, same outputs, same
+# aggregation; the child is the PyTorch experiment.py. PyTorch-only options: --device,
+# --threads-per-job (default: cores // concurrency — one torch thread per job is what makes
+# concurrent CPU jobs fast), --init, --replay-from-root (exact TF replay per cell),
+# --nondeterministic, --resume, --wandb-project. CPU concurrency defaults to the core count.
+#   python run_experiments.py --experiment-name torch_baseline --epochs 5 --steps 50 --device cpu \
+#       --init keras --replay-from-root tensorflow_version_gt/replay
+#   python run_experiments.py --experiment-name torch_baseline_torchinit --epochs 5 --steps 50 --device cpu
 
 import argparse
 import csv
@@ -50,9 +59,12 @@ def detect_gpu(force_cpu):
     if force_cpu:
         return False
     try:
-        import tensorflow as tf
+        #TF: import tensorflow as tf
+        #TF:
+        #TF: return len(tf.config.list_physical_devices("GPU")) > 0
+        import torch
 
-        return len(tf.config.list_physical_devices("GPU")) > 0
+        return torch.cuda.is_available()
     except Exception as e:
         print(f"[driver] GPU probe failed ({e}); using CPU.")
         return False
@@ -68,14 +80,17 @@ def run_job(job, args, use_gpu):
 
     # Inject the CUDA loader path directly into the child env (deterministic — the child
     # then starts with the right LD_LIBRARY_PATH and never needs to re-exec itself).
+    # PyTorch: cuda_ld_library_path()/cuda_bin_path() return "" (torch bundles its CUDA libs),
+    # so the LD_LIBRARY_PATH/PATH branches below are inert; CUDA_VISIBLE_DEVICES still selects
+    # the device for the child.
     env = dict(os.environ)
     env["_RG_GPU_ENV_READY"] = "1"  # child skips its own re-exec; path is already correct
     if use_gpu:
         env["CUDA_VISIBLE_DEVICES"] = "0"
-        # Force incremental VRAM allocation (env var applies regardless of init timing, unlike
-        # a late set_memory_growth call) so concurrent jobs share the GPU instead of the first
-        # one grabbing all 16 GB and starving the rest.
-        env["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
+        #TF: # Force incremental VRAM allocation (env var applies regardless of init timing, unlike
+        #TF: # a late set_memory_growth call) so concurrent jobs share the GPU instead of the first
+        #TF: # one grabbing all 16 GB and starving the rest.
+        #TF: env["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
         libs = cuda_ld_library_path()
         if libs:
             env["LD_LIBRARY_PATH"] = os.pathsep.join(
@@ -97,18 +112,29 @@ def run_job(job, args, use_gpu):
         "--shuffle-buffer", str(args.shuffle_buffer),
         "--patience", str(args.patience),
         "--experiment-name", args.experiment_name,
+        # PyTorch-only
+        "--device", "cuda" if use_gpu else "cpu",
+        "--threads", str(args.threads_per_job),
+        "--init", args.init,
+        "--wandb-project", args.wandb_project,
     ]
     if args.use_wandb:
         cmd.append("--use-wandb")
     if args.save_best_only:
         cmd.append("--save-best-only")
+    if args.replay_from_root:
+        cmd += ["--replay-from", os.path.join(args.replay_from_root, dataset, "RouteNetGauss", target, f"seed_{seed}")]
+    if args.nondeterministic:
+        cmd.append("--nondeterministic")
+    if args.resume:
+        cmd.append("--resume")
 
     label = f"{dataset}/{target}/seed_{seed}"
-    print(f"[driver] START {label}")
-    with open(log_path, "w") as logf:
+    print(f"[driver] START {label}", flush=True)
+    with open(log_path, "a" if args.resume else "w") as logf:
         proc = subprocess.run(cmd, env=env, stdout=logf, stderr=subprocess.STDOUT)
     ok = proc.returncode == 0
-    print(f"[driver] {'OK   ' if ok else 'FAIL '} {label} (rc={proc.returncode}, log={log_path})")
+    print(f"[driver] {'OK   ' if ok else 'FAIL '} {label} (rc={proc.returncode}, log={log_path})", flush=True)
     return {"job": label, "returncode": proc.returncode, "ok": ok, "log": log_path}
 
 
@@ -127,7 +153,10 @@ def aggregate(args):
         "dataset", "target", "seed", "backend", "train_seconds",
         "final_train_loss", "final_val_loss", "n_test_predictions",
         "mape_overall", "mae_us_overall", "r2_overall",
-    ] + [f"mape_{p}" for p in ["avg", "p50", "p90", "p95", "p99"]]
+    ] + [f"mape_{p}" for p in ["avg", "p50", "p90", "p95", "p99"]] + [
+        # PyTorch-only provenance columns (empty for TF rows)
+        "framework", "init", "device", "deterministic", "sample_order", "seconds_per_train_step_mean", "epochs_run",
+    ]
     with open(summary_csv, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
@@ -143,13 +172,16 @@ def aggregate(args):
             }
             for p in ["avg", "p50", "p90", "p95", "p99"]:
                 row[f"mape_{p}"] = r["test_per_percentile"][p]["mape"]
+            for k in ["framework", "init", "device", "deterministic", "sample_order", "seconds_per_train_step_mean", "epochs_run"]:
+                row[k] = r.get(k, "")
             w.writerow(row)
     return summary_csv, summary_json, len(rows)
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Run the RouteNet-Gauss TF job matrix.")
-    p.add_argument("--experiment-name", default="tf_baseline")
+    p = argparse.ArgumentParser(description="Run the RouteNet-Gauss PyTorch job matrix.")
+    #TF: p.add_argument("--experiment-name", default="tf_baseline")
+    p.add_argument("--experiment-name", default="torch_baseline")
     p.add_argument("--epochs", type=int, default=5)
     p.add_argument("--steps", type=int, default=50)
     p.add_argument("--shuffle-buffer", type=int, default=200,
@@ -165,14 +197,32 @@ def parse_args():
     p.add_argument("--use-wandb", action="store_true")
     p.add_argument("--force-cpu", action="store_true")
     p.add_argument("--gpu-concurrency", type=int, default=2)
-    p.add_argument("--cpu-concurrency", type=int, default=2)
+    #TF: p.add_argument("--cpu-concurrency", type=int, default=2)
+    p.add_argument("--cpu-concurrency", type=int, default=os.cpu_count() or 2,
+                   help="one torch thread per job (see --threads-per-job), so one job per core")
+    # ---- PyTorch-only ----
+    p.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="auto: cuda if available")
+    p.add_argument("--threads-per-job", type=int, default=None,
+                   help="torch CPU threads per job (default: cores // concurrency, at least 1)")
+    p.add_argument("--init", choices=["torch", "keras"], default="torch")
+    p.add_argument("--replay-from-root", default=None,
+                   help="tensorflow_version_gt/replay: every cell trains from the recorded TF init weights, "
+                        "scenario order and z-scores (exact replay); implies --init keras")
+    p.add_argument("--nondeterministic", action="store_true")
+    p.add_argument("--resume", action="store_true", help="pass --resume to every job")
+    p.add_argument("--wandb-project", default="routenet-gauss-tf-baseline")
     return p.parse_args()
 
 
 def main():
     args = parse_args()
-    use_gpu = detect_gpu(args.force_cpu)
+    #TF: use_gpu = detect_gpu(args.force_cpu)
+    use_gpu = detect_gpu(args.force_cpu or args.device == "cpu") if args.device != "cuda" else True
     concurrency = args.gpu_concurrency if use_gpu else args.cpu_concurrency
+    if args.threads_per_job is None:
+        args.threads_per_job = max(1, (os.cpu_count() or 1) // concurrency)
+    if args.replay_from_root:
+        args.init = "keras"
 
     # Optional subset overrides (comma-separated) — default to the full 2x2x2 matrix.
     datasets = args.datasets.split(",") if args.datasets else DATASETS
@@ -181,8 +231,8 @@ def main():
     jobs = list(itertools.product(datasets, targets, seeds))
 
     print(f"[driver] backend={'GPU' if use_gpu else 'CPU'} | {len(jobs)} jobs | "
-          f"concurrency={concurrency} | epochs={args.epochs} steps={args.steps} "
-          f"patience={args.patience}")
+          f"concurrency={concurrency} | threads/job={args.threads_per_job} | epochs={args.epochs} steps={args.steps} "
+          f"patience={args.patience} | init={args.init} | replay={args.replay_from_root}", flush=True)
 
     results = []
     with ThreadPoolExecutor(max_workers=concurrency) as pool:

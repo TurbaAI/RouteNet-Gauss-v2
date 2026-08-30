@@ -1,0 +1,7 @@
+[replay mawi_pcaps/jitter/seed_1 order] TF 2.15.0 | python 3.10.20 | out_dir=tensorflow_version_gt/replay/mawi_pcaps/RouteNetGauss/jitter/seed_1
+[replay mawi_pcaps/jitter/seed_1 order] z-score fingerprint vs tensorflow_version_gt/normalization/mawi_pcaps/RouteNetGauss/jitter/seed_1/z_scores.pkl: True  (recomputed={'flow_packets': [21878.205078125, 20489.6875], 'flow_traffic': [66856228.0, 67270408.0]})
+[replay mawi_pcaps/jitter/seed_1 order]   order: 50000/150000 steps (25s)
+[replay mawi_pcaps/jitter/seed_1 order]   order: 100000/150000 steps (35s)
+[replay mawi_pcaps/jitter/seed_1 order]   order: 150000/150000 steps (42s)
+[replay mawi_pcaps/jitter/seed_1 order] light pipeline == full pipeline for the first 2000 steps: True
+[replay mawi_pcaps/jitter/seed_1 order] sample_order.npy written: 150000 steps in 42s; first 10 = [172, 192, 29, 167, 2, 225, 100, 256, 130, 75]; distinct scenarios = 1682

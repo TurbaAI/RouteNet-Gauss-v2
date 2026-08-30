@@ -1,0 +1,68 @@
+{
+  "dataset": "mawi_pcaps",
+  "target": "jitter",
+  "seed": 2,
+  "epochs": 5,
+  "steps_per_epoch": 50,
+  "shuffle_buffer": 200,
+  "use_wandb": false,
+  "train_seconds": 1691.2,
+  "z_match": true,
+  "checkpoints": {
+    "01": {
+      "replay_name": "01-99.7743",
+      "gt_name": "01-99.7743",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "02": {
+      "replay_name": "02-99.3001",
+      "gt_name": "02-99.3001",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "03": {
+      "replay_name": "03-98.3388",
+      "gt_name": "03-98.3388",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "04": {
+      "replay_name": "04-96.6333",
+      "gt_name": "04-96.6333",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    },
+    "05": {
+      "replay_name": "05-94.2083",
+      "gt_name": "05-94.2083",
+      "same_filename": true,
+      "n_tensors": 34,
+      "n_bit_identical": 34,
+      "all_bit_identical": true,
+      "worst_rel_diff": 0.0,
+      "diffs": {}
+    }
+  },
+  "history_identical_text": true,
+  "test_predictions_bit_identical": true,
+  "test_targets_bit_identical": true,
+  "fed_order_matches_sample_order_prefix": true,
+  "all_checks_passed": true
+}

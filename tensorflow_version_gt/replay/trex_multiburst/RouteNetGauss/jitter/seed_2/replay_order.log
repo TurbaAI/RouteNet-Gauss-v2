@@ -1,0 +1,7 @@
+[replay trex_multiburst/jitter/seed_2 order] TF 2.15.0 | python 3.10.20 | out_dir=tensorflow_version_gt/replay/trex_multiburst/RouteNetGauss/jitter/seed_2
+[replay trex_multiburst/jitter/seed_2 order] z-score fingerprint vs tensorflow_version_gt/normalization/trex_multiburst/RouteNetGauss/jitter/seed_2/z_scores.pkl: True  (recomputed={'flow_packets': [8896.7734375, 17511.443359375], 'flow_traffic': [284184896.0, 398928032.0]})
+[replay trex_multiburst/jitter/seed_2 order]   order: 50000/150000 steps (10s)
+[replay trex_multiburst/jitter/seed_2 order]   order: 100000/150000 steps (23s)
+[replay trex_multiburst/jitter/seed_2 order]   order: 150000/150000 steps (32s)
+[replay trex_multiburst/jitter/seed_2 order] light pipeline == full pipeline for the first 2000 steps: True
+[replay trex_multiburst/jitter/seed_2 order] sample_order.npy written: 150000 steps in 32s; first 10 = [1516, 1105, 1575, 1128, 1945, 1896, 1585, 1902, 1839, 1923]; distinct scenarios = 541

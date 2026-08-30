@@ -1,0 +1,7 @@
+[replay mawi_pcaps/delay/seed_2 order] TF 2.15.0 | python 3.10.20 | out_dir=tensorflow_version_gt/replay/mawi_pcaps/RouteNetGauss/delay/seed_2
+[replay mawi_pcaps/delay/seed_2 order] z-score fingerprint vs tensorflow_version_gt/normalization/mawi_pcaps/RouteNetGauss/delay/seed_2/z_scores.pkl: True  (recomputed={'flow_traffic': [68095264.0, 67768632.0], 'flow_packets': [22239.97265625, 20621.232421875]})
+[replay mawi_pcaps/delay/seed_2 order]   order: 50000/150000 steps (24s)
+[replay mawi_pcaps/delay/seed_2 order]   order: 100000/150000 steps (34s)
+[replay mawi_pcaps/delay/seed_2 order]   order: 150000/150000 steps (41s)
+[replay mawi_pcaps/delay/seed_2 order] light pipeline == full pipeline for the first 2000 steps: True
+[replay mawi_pcaps/delay/seed_2 order] sample_order.npy written: 150000 steps in 41s; first 10 = [120, 13, 146, 26, 261, 243, 151, 248, 232, 256]; distinct scenarios = 1682

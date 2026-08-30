@@ -68,6 +68,76 @@ The script contains the default hyperparameters and configurations used in the p
 - Change the optimizer (and its hyperparameters) and the loss function on lines 231 and 232, respectively.
 - Model definition and the remainder of its hyperparameters can be changed on its instantiation (lines 233-245) and the call to fit the model (lines 295-307)
 
+## PyTorch port
+
+The code in this branch is the **PyTorch** version of RouteNet-Gauss. Every original TensorFlow
+line was kept as a `#TF:` comment with its PyTorch translation directly below it, so the two can be
+read side by side; the frozen TF originals are importable from [`tf_reference/`](tf_reference/README.md).
+The port was verified against the frozen TensorFlow results in `tensorflow_version_gt/` — see
+[PYTORCH_PORT.md](PYTORCH_PORT.md) (how it was translated, every semantic difference) and
+[PYTORCH_PARITY.md](PYTORCH_PARITY.md) (the measured agreement).
+
+### Quick start (PyTorch)
+
+```bash
+conda create -y -n RG_torch python=3.10 && conda activate RG_torch
+pip install "torch==2.13.0" --index-url https://download.pytorch.org/whl/cu126   # see requirements-torch.txt for why cu126
+pip install -r requirements-torch.txt
+
+python experiment.py --dataset trex_multiburst --target delay --seed 1 --epochs 5 --steps 50 --experiment-name my_run   # one job
+python run_experiments.py --experiment-name my_matrix --epochs 5 --steps 50                                             # the 2x2x2 matrix
+python train.py                                                                                                        # the paper's single-run config
+jupyter notebook evaluation_torch.ipynb                                                                                # evaluate checkpoints
+```
+
+Datasets are read from `data_torch/` (a lossless, TF-free conversion of `data/`, see
+[`data_torch/README.md`](data_torch/README.md)); TensorFlow is **not** needed to train or evaluate.
+Important runtime notes: one torch thread per concurrent CPU job (`--threads`, oversubscription is
+10–100× slower), GPU runs are deterministic and TF32 is disabled by default, and every run writes
+`resume.pt` so it can be continued with `--resume`. To reproduce the TF ground truth exactly, pass
+`--replay-from tensorflow_version_gt/replay/<dataset>/RouteNetGauss/<target>/seed_<n>` (TF's own
+initial weights, scenario order and z-scores).
+
+Additional files of the port: `torch_ragged.py` (tf.RaggedTensor stand-ins), `training_lib.py`
+(Keras-exact loss, Adam, callbacks and training loop), `convert_data_to_torch.py`,
+`convert_tf_checkpoint.py`, `compare_results.py`, `parity/` (L0/L1 harness),
+`tf_reference/replay_tf_run.py` (TF replay recorder), `pytorch_version_results/` (frozen PyTorch
+results mirroring `tensorflow_version_gt/`).
+
+### Glossary
+
+- **Cell** — one combination of the experiment matrix `dataset × target × seed`, e.g.
+  `trex_multiburst / delay / seed 1`; one training job with its own results folder
+  `results/<experiment>/<dataset>/RouteNetGauss/<target>/seed_<n>/`. The quick TF baseline is the
+  2 × 2 × 2 matrix `{mawi_pcaps, trex_multiburst} × {delay, jitter} × {1, 2}` = 8 cells.
+- **GT (ground truth)** — the frozen TensorFlow results in `tensorflow_version_gt/`: the 8-cell
+  quick 5×50 baseline and the two converged `trex_multiburst` seed-1 runs.
+- **Scenario** — one network sample of a dataset (a topology with its flows over `seg_num` time
+  windows); one training step processes one scenario (there is no batching).
+- **Z-score step** — the normalisation constants for the two standardised inputs
+  (`flow_traffic`, `flow_packets`): mean and standard deviation over the first 500 scenarios of
+  the *shuffled* training stream (`get_z_scores_dict(..., summarize=500)`), saved as
+  `z_scores.pkl`; the model feeds `(x − mean)/std`. It matters for replaying TF exactly because
+  it consumes the first shuffled pass (so `model.fit` sees the second), and because recomputing
+  it and matching the GT's values bit-for-bit is the *fingerprint* that a replayed stream is the
+  GT's.
+- **Exact replay** — a PyTorch run that starts from TF's recorded initial weights, sees the
+  recorded scenario order and uses the recorded z-scores of a GT cell
+  (`tensorflow_version_gt/replay/...`, produced by `tf_reference/replay_tf_run.py`), so that the
+  only remaining difference to the GT is framework arithmetic.
+- **Native run** — a PyTorch run using PyTorch's own initialisation and its own seeded shuffle,
+  i.e. the pipeline as it will be used going forward; compared with the GT statistically.
+- **Parity levels** — **L0** forward pass with identical weights on identical scenarios;
+  **L1** loss, gradients and one optimizer step from identical weights; **L2** exact-replay
+  training; **L3** native training compared statistically (within the TF seed spread).
+- **Seed spread** — the difference between the two TF seeds of a cell (`|seed 1 − seed 2|`),
+  the natural yardstick for how much a training outcome can move for reasons unrelated to the
+  framework.
+- **Chaos envelope** — how far the TF ground truth moves from itself when only the thread
+  count changes (`TF_NUM_INTRAOP_THREADS=1`): a different rounding order in float32 gives
+  different weights after one epoch while the per-step losses stay within ~3e-5. Any two
+  float32 implementations differ at least this much; the PyTorch port is compared against it.
+
 ## License
 
 See the [file](LICENSE) for the full license:

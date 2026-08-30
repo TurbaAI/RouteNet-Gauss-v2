@@ -72,3 +72,9 @@ tensorboard/
 
 # Local Weights & Biases run logs
 /wandb/
+# PyTorch experiment outputs (experiment.py / run_experiments.py, regenerable). The tracked
+# snapshots live under pytorch_version_results/ (mirroring tensorflow_version_gt/).
+/ckpt/torch_*/
+/normalization/torch_*/
+/ckpt/smoke*/
+/normalization/smoke*/

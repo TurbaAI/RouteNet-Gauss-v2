@@ -1,0 +1,58 @@
+{
+  "mawi_pcaps/delay/seed_1": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "mawi_pcaps/delay/seed_2": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "mawi_pcaps/jitter/seed_1": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "mawi_pcaps/jitter/seed_2": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "trex_multiburst/delay/seed_1": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "trex_multiburst/delay/seed_2": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "trex_multiburst/jitter/seed_1": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  },
+  "trex_multiburst/jitter/seed_2": {
+    "returncodes": {
+      "order": 0,
+      "train": 0
+    },
+    "all_checks_passed": true
+  }
+}
