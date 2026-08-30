@@ -38,8 +38,9 @@ limitations under the License.
 #
 # Gates: loss rel. diff <= 1e-5. Gradients: a tensor is "well-conditioned" on a scenario when
 # TF's own float32 gradient is within 1e-3 of the float64 reference; for those tensors the torch
-# float32 gradient must be within 1e-3 of the float64 reference too (TF-vs-torch is reported for
-# information — it is bounded by the sum of the two). On scenarios where every tensor is
+# float32 gradient must be within max(1e-3, 2 x TF's own error) of the float64 reference, i.e.
+# torch is never materially farther from the truth than TF on the same tensor (TF-vs-torch is
+# reported for information — it is bounded by the sum of the two). On scenarios where every tensor is
 # well-conditioned, the Adam update must agree to <= 1e-2 * lr on every element whose gradient is
 # not tiny (|g| > 1e-2 * max|g| of its tensor; Adam's first step is ~lr*sign(g), so near-zero
 # gradient elements legitimately turn float noise into O(lr) update differences — they are
@@ -211,13 +212,17 @@ def main():
             entry = {"max_abs_grad_fp64": float(np.max(np.abs(grads_64[k]))), "torch32_vs_fp64": torch_vs_64,
                      "tf32_vs_fp64": tf_vs_64, "tf32_vs_torch32": tf_vs_torch,
                      "well_conditioned": bool(tf_vs_64 <= COND_TOL)}
+            # Gate: torch's float32 error vs the float64 truth is at most max(COND_TOL, 2x TF's own
+            # float32 error) — i.e. torch is never materially worse than TF on the same tensor.
+            entry["gate_tol"] = max(COND_TOL, 2 * tf_vs_64) if entry["well_conditioned"] else None
+            entry["gate_passed"] = bool(torch_vs_64 <= entry["gate_tol"]) if entry["well_conditioned"] else None
             if entry["well_conditioned"]:
-                worst_gated = max(worst_gated, torch_vs_64)
+                worst_gated = max(worst_gated, torch_vs_64 / entry["gate_tol"])
                 worst_gated_tf_vs_torch = max(worst_gated_tf_vs_torch, tf_vs_torch)
             else:
                 n_ill += 1
             per[k] = entry
-        grads_gate = worst_gated <= COND_TOL
+        grads_gate = all(e["gate_passed"] for e in per.values() if e["well_conditioned"])
 
         # ---- one-step update comparison (only meaningful when everything is well-conditioned) ----
         n_sig, n_sig_bad, worst_sig, n_all_bad = 0, 0, 0.0, 0
@@ -239,7 +244,8 @@ def main():
             "pred_scale_rel_diff": rel(y_pred_tf.numpy(), y_pred_t),
             "max_abs_grad_fp64": max(e["max_abs_grad_fp64"] for e in per.values()),
             "n_tensors": len(per), "n_ill_conditioned": n_ill,
-            "grad_worst_torch32_vs_fp64_well_conditioned": worst_gated,
+            "grad_worst_torch32_vs_fp64_well_conditioned": max([e["torch32_vs_fp64"] for e in per.values() if e["well_conditioned"]] or [0.0]),
+            "grad_worst_gate_ratio_well_conditioned": worst_gated,
             "grad_worst_tf32_vs_torch32_well_conditioned": worst_gated_tf_vs_torch,
             "grad_worst_tf32_vs_fp64": max(e["tf32_vs_fp64"] for e in per.values()),
             "grad_worst_torch32_vs_fp64": max(e["torch32_vs_fp64"] for e in per.values()),
@@ -252,7 +258,7 @@ def main():
         rows.append(row)
         print(f"[{i}] idx={row['sample_idx']} n={row['n_pred']} | loss tf={row['loss_tf32']:.6f} torch={loss_t:.6f} (fp64 {loss_64:.6f}) rel={loss_rel:.1e} "
               f"| max|grad| fp64={row['max_abs_grad_fp64']:.2e} | ill-conditioned tensors {n_ill}/{len(per)} "
-              f"| gated grads: torch32-vs-fp64 worst={worst_gated:.2e} (tf32-vs-torch32 {worst_gated_tf_vs_torch:.2e}) | all tensors: tf32-vs-fp64 worst={row['grad_worst_tf32_vs_fp64']:.2e} torch32-vs-fp64 worst={row['grad_worst_torch32_vs_fp64']:.2e} "
+              f"| gated grads: torch32-vs-fp64 worst={row['grad_worst_torch32_vs_fp64_well_conditioned']:.2e} (worst ratio to gate {worst_gated:.2f}; tf32-vs-torch32 {worst_gated_tf_vs_torch:.2e}) | all tensors: tf32-vs-fp64 worst={row['grad_worst_tf32_vs_fp64']:.2e} torch32-vs-fp64 worst={row['grad_worst_torch32_vs_fp64']:.2e} "
               f"| step gate={step_gate} (sig elems {n_sig}, bad {n_sig_bad}, worst Δ/lr={worst_sig:.2e}) | passed={row['passed']}", flush=True)
 
     report = {

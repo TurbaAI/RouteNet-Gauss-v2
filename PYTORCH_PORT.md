@@ -149,10 +149,17 @@ replay recorder); native runs recompute them from their own first pass.
   8e-6 and 7e-5. `experiment.py` disables TF32 (`--allow-tf32` re-enables it).
 - Speed: see PYTORCH_PARITY.md (speed table).
 
-### 5.7 `inference_mode`
+### 5.7 `inference_mode` — a latent bug in the TF evaluation
 As in TF, `model.inference_mode = True` (set after training, before `predict`) clamps
-predictions at 0. In TF this attribute is read at graph-trace time; in PyTorch it is read on
-every call.
+predictions at 0. In TF this attribute is read at **graph-trace time**: `call` is a
+`@tf.function`, and `predict` reuses the traces cached during training (per input-shape
+signature), which were traced with `inference_mode=False`. Consequently a fraction of the GT test
+predictions were never clamped: 879 negative delay predictions (0.10 %) in the converged
+`trex_multiburst/delay` run, 50 in the jitter run. Clamping the stored GT predictions reproduces
+a fresh TF forward pass and the PyTorch one to 5 digits (MAPE 5.0745 → **5.0368** for delay,
+11.7496 → 11.7490 for jitter). PyTorch reads the attribute on every call, so every prediction is
+clamped as intended; `compare_results.py` therefore recomputes the GT metrics from clamped
+predictions and shows the stored values alongside.
 
 ### 5.8 What is *not* translated
 `tf.autograph` loop options, `tf.ensure_shape`, `tf.function` retracing, the TF GPU
