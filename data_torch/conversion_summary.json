@@ -1,0 +1,105 @@
+{
+ "created_utc": "2026-08-30T16:22:00Z",
+ "source_git_commit": "2e30d5d48be8fe0273942f7f6414dec40ae635d6",
+ "dropped_fields": [
+  "flow_packets_per_ms"
+ ],
+ "partitions": {
+  "mawi_pcaps/test": {
+   "n_shards": 1,
+   "n_samples": 172,
+   "bytes": 17311130,
+   "verified_bit_exact": true
+  },
+  "mawi_pcaps/training": {
+   "n_shards": 9,
+   "n_samples": 1682,
+   "bytes": 174541936,
+   "verified_bit_exact": true
+  },
+  "mawi_pcaps/validation": {
+   "n_shards": 2,
+   "n_samples": 336,
+   "bytes": 35861793,
+   "verified_bit_exact": true
+  },
+  "mawi_pcaps_simulated/test": {
+   "n_shards": 1,
+   "n_samples": 172,
+   "bytes": 16872993,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst/test": {
+   "n_shards": 1,
+   "n_samples": 51,
+   "bytes": 13041148,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst/training": {
+   "n_shards": 2,
+   "n_samples": 541,
+   "bytes": 107272425,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst/validation": {
+   "n_shards": 1,
+   "n_samples": 108,
+   "bytes": 20453378,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst_filtered/training": {
+   "n_shards": 2,
+   "n_samples": 543,
+   "bytes": 107953446,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst_filtered/validation": {
+   "n_shards": 1,
+   "n_samples": 108,
+   "bytes": 20606567,
+   "verified_bit_exact": true
+  },
+  "trex_multiburst_simulated/test": {
+   "n_shards": 1,
+   "n_samples": 51,
+   "bytes": 10770919,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic/test": {
+   "n_shards": 1,
+   "n_samples": 178,
+   "bytes": 23500100,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic/training": {
+   "n_shards": 2,
+   "n_samples": 1376,
+   "bytes": 145838646,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic/validation": {
+   "n_shards": 1,
+   "n_samples": 274,
+   "bytes": 29485996,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic_filtered/training": {
+   "n_shards": 3,
+   "n_samples": 1386,
+   "bytes": 140846945,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic_filtered/validation": {
+   "n_shards": 1,
+   "n_samples": 276,
+   "bytes": 28502636,
+   "verified_bit_exact": true
+  },
+  "trex_synthetic_simulated/test": {
+   "n_shards": 1,
+   "n_samples": 178,
+   "bytes": 19388863,
+   "verified_bit_exact": true
+  }
+ }
+}

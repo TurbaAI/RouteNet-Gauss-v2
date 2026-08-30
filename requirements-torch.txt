@@ -1,0 +1,22 @@
+# PyTorch environment for the RouteNet-Gauss port (conda env `RG_torch`, Python 3.10).
+#
+#   conda create -y -n RG_torch python=3.10
+#   conda activate RG_torch
+#   pip install "torch==2.13.0" --index-url https://download.pytorch.org/whl/cu126
+#   pip install -r requirements-torch.txt
+#
+# Why the cu126 index: torch 2.13's default PyPI wheel is built for CUDA 13 (needs an NVIDIA
+# driver >= 580); this machine's driver (570.x, CUDA 12.8) runs the CUDA 12.6 build. PyTorch's
+# cu128 index stops at torch 2.11. `torch` itself is therefore NOT listed below — install it
+# with the command above (pip would otherwise pull the CUDA 13 wheel from PyPI).
+#
+# tensorflow-cpu is only needed for (a) `convert_data_to_torch.py`, (b) `convert_tf_checkpoint.py`
+# and (c) the side-by-side L0/L1 parity harness under `parity/`. Training and evaluation in
+# PyTorch do not import TensorFlow.
+tensorflow-cpu==2.15.0
+numpy==1.26.3          # TF 2.15 needs numpy<2; torch 2.13 works with 1.26
+wandb==0.28.0
+notebook==7.6.2
+pandas==2.3.3
+matplotlib==3.10.9
+networkx==3.4.2

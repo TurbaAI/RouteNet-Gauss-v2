@@ -1,0 +1,684 @@
+{
+ "format_version": 1,
+ "dataset": "mawi_pcaps",
+ "partition": "test",
+ "source": "data/mawi_pcaps/test",
+ "source_git_commit": "2e30d5d48be8fe0273942f7f6414dec40ae635d6",
+ "converter": "convert_data_to_torch.py",
+ "tensorflow_version": "2.15.0",
+ "torch_version": "2.13.0+cu126",
+ "created_utc": "2026-08-30T16:14:24Z",
+ "dropped_fields": [
+  "flow_packets_per_ms"
+ ],
+ "element_spec": {
+  "num_s_links": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "total_loss_rate": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "num_routers": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "flow_p75_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "loss_rate_per_seg": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_total_avg_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_p95_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_p90_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "num_r_links": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "link_r_capacity": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_p99_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "num_switches": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "switches_groupings_inversed": {
+   "dtype": "int32",
+   "shape": [
+    null
+   ],
+   "ragged": false
+  },
+  "flow_max_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_length": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "sample_idx": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "link_to_path": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "flow_trans_pkts_per_seg": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    40
+   ],
+   "ragged": false
+  },
+  "flow_avg_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_seg_membership": {
+   "dtype": "int32",
+   "shape": null,
+   "ragged": false
+  },
+  "node_groupings_inversed": {
+   "dtype": "int32",
+   "shape": [
+    null
+   ],
+   "ragged": false
+  },
+  "flow_p95_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "path_to_r_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null,
+    2
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "flow_p90_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "queue_to_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "link_r_pkt_header_size": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_has_jitter": {
+   "dtype": "bool",
+   "shape": [
+    null,
+    40
+   ],
+   "ragged": false
+  },
+  "flow_packets_per_ms": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    null,
+    1
+   ],
+   "ragged": true,
+   "ragged_rank": 2,
+   "row_splits_dtype": "int64"
+  },
+  "flow_packet_size": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_traffic": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_total_packets": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "routers_groupings_inversed": {
+   "dtype": "int32",
+   "shape": [
+    null
+   ],
+   "ragged": false
+  },
+  "link_pkt_header_size": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "path_to_s_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null,
+    2
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "flow_p50_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "num_traffic_generators": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "num_flows": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "flow_avg_jitter": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "seg_num": {
+   "dtype": "int32",
+   "shape": [],
+   "ragged": false
+  },
+  "flow_max_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "switches_groupings": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "link_capacity": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "routers_groupings": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "buffer_type": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "path_to_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null,
+    2
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "flow_packets": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_total_trans_pkts": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_id": {
+   "dtype": "string",
+   "shape": [
+    null
+   ],
+   "ragged": false
+  },
+  "flow_p50_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "link_s_pkt_header_size": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "link_s_capacity": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_has_traffic": {
+   "dtype": "bool",
+   "shape": [
+    null,
+    40
+   ],
+   "ragged": false
+  },
+  "flow_p75_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_has_delay": {
+   "dtype": "bool",
+   "shape": [
+    null,
+    40
+   ],
+   "ragged": false
+  },
+  "r_queue_to_r_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "node_groupings": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    null
+   ],
+   "ragged": true,
+   "ragged_rank": 1,
+   "row_splits_dtype": "int64"
+  },
+  "s_queue_to_s_link": {
+   "dtype": "int32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  },
+  "flow_p99_delay": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    40,
+    1
+   ],
+   "ragged": false
+  },
+  "__y__": {
+   "dtype": "float32",
+   "shape": [
+    null,
+    1
+   ],
+   "ragged": false
+  }
+ },
+ "n_shards": 1,
+ "n_samples": 172,
+ "shards": [
+  {
+   "shard": 0,
+   "file": "0.pt.gz",
+   "n_samples": 172,
+   "bytes": 17311130,
+   "raw_bytes": 26085767,
+   "sha256": "2fbb9ea80718399b8c19b0c8096d35f31c6a97bff0d2ec084752ebbf91856889",
+   "sample_idx": [
+    10,
+    23,
+    55,
+    57,
+    59,
+    64,
+    71,
+    79,
+    111,
+    143,
+    155,
+    185,
+    188,
+    195,
+    196,
+    212,
+    215,
+    221,
+    247,
+    249,
+    264,
+    271,
+    280,
+    285,
+    289,
+    299,
+    300,
+    312,
+    321,
+    343,
+    358,
+    359,
+    364,
+    371,
+    373,
+    380,
+    403,
+    414,
+    422,
+    454,
+    465,
+    468,
+    478,
+    489,
+    507,
+    536,
+    568,
+    577,
+    579,
+    591,
+    594,
+    608,
+    634,
+    635,
+    644,
+    672,
+    677,
+    697,
+    701,
+    710,
+    716,
+    727,
+    750,
+    751,
+    757,
+    761,
+    785,
+    798,
+    827,
+    833,
+    841,
+    877,
+    878,
+    889,
+    899,
+    937,
+    953,
+    959,
+    968,
+    970,
+    1021,
+    1024,
+    1055,
+    1067,
+    1092,
+    1113,
+    1127,
+    1134,
+    1139,
+    1164,
+    1173,
+    1212,
+    1230,
+    1237,
+    1251,
+    1252,
+    1287,
+    1299,
+    1307,
+    1326,
+    1329,
+    1333,
+    1342,
+    1354,
+    1367,
+    1369,
+    1400,
+    1415,
+    1418,
+    1432,
+    1444,
+    1453,
+    1480,
+    1486,
+    1544,
+    1546,
+    1562,
+    1582,
+    1604,
+    1632,
+    1638,
+    1639,
+    1641,
+    1642,
+    1647,
+    1681,
+    1705,
+    1706,
+    1726,
+    1729,
+    1757,
+    1773,
+    1787,
+    1801,
+    1805,
+    1806,
+    1830,
+    1858,
+    1861,
+    1883,
+    1888,
+    1899,
+    1903,
+    1904,
+    1909,
+    1918,
+    1929,
+    1950,
+    1965,
+    1967,
+    1971,
+    1984,
+    1994,
+    2010,
+    2032,
+    2034,
+    2047,
+    2076,
+    2082,
+    2110,
+    2127,
+    2136,
+    2149,
+    2153,
+    2167,
+    2170,
+    2172,
+    2173,
+    2177,
+    2200,
+    2203,
+    2214
+   ],
+   "verified_bit_exact": true
+  }
+ ],
+ "verified_bit_exact": true
+}
