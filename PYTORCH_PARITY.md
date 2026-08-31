@@ -197,6 +197,29 @@ the converged run (§5). Raw results: `pytorch_version_results/quick/torch_basel
 
 Gate (Phase A): R² within ±0.03, MAPE within ±1 pt. Phase B reported as "not worse".
 
+## 5b. Evaluation notebook (`evaluation_torch.ipynb`)
+
+The PyTorch copy of the paper's evaluation notebook runs end to end (`jupyter nbconvert --execute`,
+exit 0) and reproduces the paper's model-vs-simulator comparison on all six (dataset, metric)
+combinations, e.g.:
+
+| dataset | metric | RouteNet-Gauss (torch) | OMNeT++ |
+|---|---|--:|--:|
+| trex_synthetic | delay (avg) | 2.604 % MAPE, R² 0.941 | 53.684 %, R² −4.337 |
+| trex_synthetic | jitter (avg) | 9.447 %, R² 0.757 | 24.999 %, R² −0.584 |
+| trex_multiburst | delay (avg) | 2.277 %, R² 0.921 | 56.122 %, R² −4.508 |
+| trex_multiburst | jitter (avg) | 10.711 %, R² 0.529 | 37.435 %, R² −1.980 |
+| mawi_pcaps | delay (avg) | 12.990 %, R² 0.080 | 55.808 %, R² 0.939 |
+| mawi_pcaps | jitter (avg) | 12.773 %, R² 0.628 | 9.399 %, R² 0.843 |
+
+Its two data paths are verified independently: the **model column** by L0 (§1 — the same paper
+checkpoints on the same test sets, TF ≡ torch to ≤ 2.7e-4 scale-relative, MAPE equal to 5–6
+digits), and the **OMNeT++ column**, which runs notebook-only code
+(`concatenate_ds_with_donor_mask`, selecting windows of the `_simulated` set with the testbed
+set's mask), by `parity/check_notebook_eval.py`: **bit-identical to TensorFlow for all six
+combinations** (1.6 M values; log:
+`pytorch_version_results/parity/notebook_donor_mask_check.log`).
+
 ## 6. Speed
 
 | setting | seconds / training step (trex ≈ 84 flows × 50 windows / mawi ≈ 40 × 40) | notes |

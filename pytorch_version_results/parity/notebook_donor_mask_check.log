@@ -1,0 +1,7 @@
+mawi_pcaps/delay: shape (247483, 5) vs (247483, 5) | bit-identical: True
+mawi_pcaps/jitter: shape (247452, 5) vs (247452, 5) | bit-identical: True
+trex_multiburst/delay: shape (175028, 5) vs (175028, 5) | bit-identical: True
+trex_multiburst/jitter: shape (174242, 5) vs (174242, 5) | bit-identical: True
+trex_synthetic/delay: shape (333784, 5) vs (333784, 5) | bit-identical: True
+trex_synthetic/jitter: shape (333619, 5) vs (333619, 5) | bit-identical: True
+EXIT=0
