@@ -127,8 +127,25 @@ torch_adam` is available to use `torch.optim.Adam(eps=1e-7)` instead.
 ### 5.4 Initialisation
 Keras: glorot-uniform kernels, orthogonal recurrent kernels, zero biases. PyTorch: kaiming-uniform
 Linear weights with uniform biases; uniform(±1/√H) for all GRU tensors. `--init keras` selects
-the Keras scheme; the default is `torch` (the user's stated long-term preference). All
-TF-comparison runs pass `--init keras` explicitly and record it in `metrics.json`.
+the Keras scheme; the default is `torch`. All TF-comparison runs pass `--init keras` explicitly
+and record it in `metrics.json`.
+
+**Measured consequence (trex_multiburst / delay / seed 1, 500 steps per epoch).** Training starts
+on a plateau at val_loss ≈ 86.7 that the model has to escape before it learns anything. The
+initialisation decides *when* that happens, not whether:
+
+| init | plateau exit | val_loss over the next epochs | best val_loss |
+|---|--:|---|--:|
+| Keras (TF ground truth) | epoch **6** | 49.6 → 21.5 → 15.6 → 12.7 | 7.07 (epoch 30) |
+| PyTorch default | epoch **21** | 56.4 → 21.7 → 22.2 → 18.5 | (run in progress) |
+
+The descent dynamics after the break are nearly identical; PyTorch's default init simply spends
+~15 more epochs (~10 h of CPU training here) on the plateau, and en route it also produced a
+transient divergence (train loss 86 → 106 at epochs 7-9) that the Keras init did not. Short runs
+cannot see this — the quick 5×50 set never leaves the plateau at all, and its native-init cells
+still match TF to within ±0.3 MAPE points. **Recommendation: keep `--init keras` for anything
+compared against the TF results or trained on a budget; the `torch` default is fine but pay for
+it in warm-up epochs.**
 
 ### 5.5 Shuffle order and z-scores
 See §3. In the TF pipeline the z-score step consumes the first shuffled pass and `model.fit` the
