@@ -24,7 +24,8 @@ limitations under the License.
 #
 # For every torch cell it reports test MAPE / MAE / R2 next to the TF cell, the deltas, and a
 # verdict against the agreed gates:
-#   exact-replay delay runs                                    MAPE within +-0.5 pt, R2 within +-0.02
+#   exact-replay delay runs                                    MAPE within +-0.5 pt, R2 within
+#                                                              max(+-0.02, 2x TF seed spread)
 #   exact-replay jitter runs                                   statistical gate (chaotic objective:
 #                                                              TF's own thread-count re-run misses
 #                                                              the tight gate, PYTORCH_PARITY.md 3.1)
@@ -116,8 +117,13 @@ def compare(tf_cells, torch_cells, converged, replay_root):
                 ok = abs(row["d_mape"]) <= 1.0 and abs(row["d_r2"]) <= 0.03
                 gate = "MAPE +-1pt, R2 +-0.03"
             elif exact and target == "delay":
-                ok = abs(row["d_mape"]) <= 0.5 and abs(row["d_r2"]) <= 0.02
-                gate = "MAPE +-0.5pt, R2 +-0.02"
+                # R2 of the deliberately unconverged quick models sits far outside [0,1]
+                # (trex delay: -32.6), where an absolute +-0.02 is tighter than TF's own
+                # seed-to-seed variation (0.21 there); the bound scales with the seed spread
+                # exactly like the native gate.
+                r2_tol = max(0.02, 2 * spread_r2) if spread_r2 is not None else 0.02
+                ok = abs(row["d_mape"]) <= 0.5 and abs(row["d_r2"]) <= r2_tol
+                gate = f"MAPE +-0.5pt, R2 +-{r2_tol:.3f} (max(0.02, 2x TF seed spread))"
             elif exact:
                 # jitter: the loss landscape is chaotic enough that TF's own re-run under a
                 # different thread count ends >1 MAPE point from the GT after 250 steps (see

@@ -1,0 +1,63 @@
+{
+  "dataset": "mawi_pcaps",
+  "target": "jitter",
+  "seed": 1,
+  "epochs": 5,
+  "epochs_run": 5,
+  "patience": 0,
+  "steps_per_epoch": 50,
+  "backend": "cpu",
+  "train_seconds": 2677.39,
+  "final_train_loss": 96.32951024317255,
+  "final_val_loss": 95.07211082736204,
+  "best_val_loss": 95.07211082736204,
+  "n_test_predictions": 247452,
+  "test_overall": {
+    "mape": 94.89820003509521,
+    "mae_us": 38.81498196278699,
+    "r2": -0.9496127073536986
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 94.09171938896179,
+      "mae_us": 14.258835108194035,
+      "r2": -4.15428850428426
+    },
+    "p50": {
+      "mape": 85.26114225387573,
+      "mae_us": 7.385533081105677,
+      "r2": -2.605244343505194
+    },
+    "p90": {
+      "mape": 98.0703592300415,
+      "mae_us": 37.44076093425974,
+      "r2": -5.098978072010013
+    },
+    "p95": {
+      "mape": 98.03348183631897,
+      "mae_us": 50.537051720311865,
+      "r2": -4.209235015649615
+    },
+    "p99": {
+      "mape": 99.03419613838196,
+      "mae_us": 84.45273124380037,
+      "r2": -2.2362853254532196
+    }
+  },
+  "experiment_path": "torch_baseline_torchinit/mawi_pcaps/RouteNetGauss/jitter/seed_1",
+  "framework": "torch",
+  "torch_version": "2.13.0+cu126",
+  "device": "cpu",
+  "threads": 1,
+  "deterministic": true,
+  "tf32": false,
+  "init": "torch",
+  "init_weights": null,
+  "sample_order": "native (ListDataset shuffle)",
+  "z_scores_source": "normalization/torch_baseline_torchinit/mawi_pcaps/RouteNetGauss/jitter/seed_1/z_scores.pkl",
+  "optimizer": "keras_adam",
+  "shuffle_buffer": 200,
+  "resumed": false,
+  "seconds_per_train_step_mean": 3.7156953392028806,
+  "test_eval_seconds": 154.22
+}

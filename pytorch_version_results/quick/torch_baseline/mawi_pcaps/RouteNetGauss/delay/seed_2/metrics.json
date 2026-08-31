@@ -1,0 +1,63 @@
+{
+  "dataset": "mawi_pcaps",
+  "target": "delay",
+  "seed": 2,
+  "epochs": 5,
+  "epochs_run": 5,
+  "patience": 0,
+  "steps_per_epoch": 50,
+  "backend": "cpu",
+  "train_seconds": 4094.92,
+  "final_train_loss": 87.45214367131369,
+  "final_val_loss": 87.6604737748153,
+  "best_val_loss": 87.6604737748153,
+  "n_test_predictions": 247483,
+  "test_overall": {
+    "mape": 87.20495104789734,
+    "mae_us": 243.15208429470658,
+    "r2": -0.15794697906918853
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 83.49753618240356,
+      "mae_us": 121.30248069297522,
+      "r2": -0.20298560551254363
+    },
+    "p50": {
+      "mape": 80.87607026100159,
+      "mae_us": 89.53953511081636,
+      "r2": -0.13291684045417518
+    },
+    "p90": {
+      "mape": 88.6099100112915,
+      "mae_us": 243.48750594072044,
+      "r2": -0.15359694043814143
+    },
+    "p95": {
+      "mape": 90.55368304252625,
+      "mae_us": 313.4997677989304,
+      "r2": -0.19517161152497398
+    },
+    "p99": {
+      "mape": 92.4875795841217,
+      "mae_us": 447.930971859023,
+      "r2": -0.264569607011933
+    }
+  },
+  "experiment_path": "torch_baseline/mawi_pcaps/RouteNetGauss/delay/seed_2",
+  "framework": "torch",
+  "torch_version": "2.13.0+cu126",
+  "device": "cpu",
+  "threads": 1,
+  "deterministic": true,
+  "tf32": false,
+  "init": "keras",
+  "init_weights": "tensorflow_version_gt/replay/mawi_pcaps/RouteNetGauss/delay/seed_2/init_weights.npz",
+  "sample_order": "tensorflow_version_gt/replay/mawi_pcaps/RouteNetGauss/delay/seed_2/sample_order.npy",
+  "z_scores_source": "tensorflow_version_gt/replay/mawi_pcaps/RouteNetGauss/delay/seed_2/z_scores.pkl",
+  "optimizer": "keras_adam",
+  "shuffle_buffer": 200,
+  "resumed": false,
+  "seconds_per_train_step_mean": 5.735357724189758,
+  "test_eval_seconds": 237.03
+}
