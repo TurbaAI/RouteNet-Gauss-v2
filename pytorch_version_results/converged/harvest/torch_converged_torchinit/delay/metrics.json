@@ -1,0 +1,48 @@
+{
+  "dataset": "trex_multiburst",
+  "target": "delay",
+  "seed": 1,
+  "checkpoint": "ckpt/torch_converged_torchinit/trex_multiburst/RouteNetGauss/delay/seed_1/47-6.6055.pt",
+  "checkpoint_name": "47-6.6055",
+  "epoch": 47,
+  "best_val_loss": 6.6055,
+  "n_test_predictions": 175028,
+  "test_overall": {
+    "mape": 4.837273061275482,
+    "mae_us": 6.440225206461037,
+    "r2": 0.7396906476814125
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 4.714406281709671,
+      "mae_us": 5.820641490572598,
+      "r2": 0.7770345215342028
+    },
+    "p50": {
+      "mape": 4.913836717605591,
+      "mae_us": 5.990994395688176,
+      "r2": 0.778389510513128
+    },
+    "p90": {
+      "mape": 4.5605238527059555,
+      "mae_us": 6.20324590272503,
+      "r2": 0.7010369732613297
+    },
+    "p95": {
+      "mape": 4.721688851714134,
+      "mae_us": 6.570106961589772,
+      "r2": 0.6926777927985308
+    },
+    "p99": {
+      "mape": 5.275910347700119,
+      "mae_us": 7.6161427386978175,
+      "r2": 0.6731766665703534
+    }
+  },
+  "framework": "torch",
+  "torch_version": "2.13.0+cu126",
+  "device": "cpu",
+  "eval_seconds": 294.57,
+  "harvested_utc": "2026-09-01T08:37:11Z",
+  "note": "evaluated from the best checkpoint of a still-running training job (see parity/eval_checkpoint.py)"
+}

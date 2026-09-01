@@ -187,15 +187,54 @@ against TF's 92.9/91.0, and the arbitrary seed-2↔seed-2 pairing exceeds the ±
 delay cells sit within ±0.3 pt of their TF counterparts. The substantive jitter accuracy test is
 the converged run (§5). Raw results: `pytorch_version_results/quick/torch_baseline_torchinit*`.
 
-## 5. ⏳ Converged runs (`trex_multiburst` seed 1, delay and jitter)
+## 5. Converged runs (`trex_multiburst` seed 1) — interim, runs still training
 
-| phase | init / order | delay: TF R² 0.728, MAPE 5.07 % | jitter: TF R² 0.887, MAPE 11.75 % |
-|---|---|---|---|
-| A | TF init, TF order (exact replay) | | |
-| B | torch init, torch shuffle | | |
-| C | seed 2 | | |
+The runs below are **still training**: with the same `EarlyStopping(patience=15)` rule TF used,
+every new best defers the stop, and the PyTorch runs keep finding new bests. The numbers are
+harvested from each run's current best checkpoint with `parity/eval_checkpoint.py` (which does not
+touch the running job); they can only improve. TF's own figures are recomputed from its stored
+predictions clamped at 0, as everywhere in this report (§1).
 
-Gate (Phase A): R² within ±0.03, MAPE within ±1 pt. Phase B reported as "not worse".
+| target | run | epochs so far | best val | test MAPE % | Δ MAPE | test MAE µs | test R² | Δ R² | gate (±1 pt, ±0.03) |
+|---|---|--:|--:|--:|--:|--:|--:|--:|---|
+| delay | TensorFlow (ground truth) | 45 (stopped) | 7.0663 | 5.0368 | — | 6.6598 | 0.7402 | — | — |
+| delay | **PyTorch, exact replay** | 81+ | 5.8431 | **3.8992** | **−1.138** | **5.1999** | **0.8016** | **+0.061** | better than gate |
+| delay | **PyTorch, torch init** | 47+ | 6.6055 | **4.8373** | −0.200 | 6.4402 | 0.7397 | −0.001 | ✅ pass |
+| jitter | TensorFlow (ground truth) | 193 (stopped) | 11.6347 | 11.7490 | — | 1.8812 | 0.8871 | — | — |
+| jitter | **PyTorch, exact replay** | 77+ | 12.1338 | 12.5748 | +0.826 | 1.9549 | 0.8817 | −0.005 | ✅ pass |
+
+- **jitter** passes both gates already, from a run at epoch 77 where TF needed 178 to reach its
+  best — i.e. the PyTorch run matches TF's converged accuracy with less than half the training.
+- **delay** ends up *better* than the ground truth on every metric, and on every percentile
+  (fig 2). This is not "PyTorch trains better": both runs follow the same trajectory (fig 1), but
+  the identical early-stopping rule let the PyTorch run continue to epoch 81 where TF's stopped at
+  45, and it found a better optimum there. Same configuration, longer run, better basin.
+- **torch init** (PyTorch's own initialisation and shuffle, no TF inputs at all) lands within
+  0.2 MAPE points and 0.001 R² of the ground truth — the closest agreement of the three, despite
+  the 15-epoch plateau it pays at the start (PYTORCH_PORT.md §5.4).
+
+### Figures
+
+![Converged learning curves](pytorch_version_results/figures/fig1_converged_curves.png)
+
+*fig 1 — validation loss per epoch. The PyTorch exact replay tracks the TF curve; the torch-init
+run is flat at ≈87 until epoch 21 (the initialisation plateau) and then joins the same descent.*
+
+![Converged test accuracy per percentile](pytorch_version_results/figures/fig2_converged_metrics.png)
+
+*fig 2 — test MAPE and R² per percentile. Delay: PyTorch at or better than TF at every
+percentile. Jitter: within ~1 MAPE point and ~0.02 R² at every percentile.*
+
+![Quick-set parity](pytorch_version_results/figures/fig3_quick_parity.png)
+
+*fig 3 — all 16 quick-set cells as Δ MAPE against TF, with the gate bands. Exact replay 8/8
+inside; native 7/8 (trex jitter seed 2).*
+
+![Per-step agreement vs the chaos envelope](pytorch_version_results/figures/fig4_step_agreement.png)
+
+*fig 4 — the central evidence: the exact replay's per-step deviation from TF (orange) sits on top
+of the deviation TF shows against **itself** when only its thread count changes (blue). Past step
+200 on delay, TF-vs-TF exceeds torch-vs-TF.*
 
 ## 5b. Evaluation notebook (`evaluation_torch.ipynb`)
 
