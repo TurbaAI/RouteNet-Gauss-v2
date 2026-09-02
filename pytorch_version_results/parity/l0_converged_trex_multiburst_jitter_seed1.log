@@ -1,0 +1,68 @@
+[   0] idx=    0 n=  4688 targets_identical=True max|Δ|=3.402e-10 scale-rel=6.990e-06 elem-rel=9.761e-05 MAPE tf=14.3591 torch=14.3591
+[   1] idx=    2 n=  4497 targets_identical=True max|Δ|=5.207e-10 scale-rel=9.491e-06 elem-rel=1.121e-04 MAPE tf=11.2513 torch=11.2513
+[   2] idx=    6 n=  3514 targets_identical=True max|Δ|=4.361e-10 scale-rel=8.166e-06 elem-rel=1.117e-04 MAPE tf=10.7623 torch=10.7623
+[   3] idx=    7 n=  3595 targets_identical=True max|Δ|=3.438e-10 scale-rel=7.173e-06 elem-rel=7.258e-05 MAPE tf=12.8545 torch=12.8545
+[   4] idx=   17 n=  4749 targets_identical=True max|Δ|=2.942e-10 scale-rel=6.071e-06 elem-rel=7.410e-05 MAPE tf=11.0909 torch=11.0909
+[   5] idx=   18 n=  3575 targets_identical=True max|Δ|=3.774e-10 scale-rel=6.517e-06 elem-rel=7.440e-05 MAPE tf=13.0596 torch=13.0596
+WARNING:tensorflow:5 out of the last 7 calls to <function RouteNetGauss.call at 0x738134500430> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+[   6] idx=   22 n=  4682 targets_identical=True max|Δ|=3.502e-10 scale-rel=6.894e-06 elem-rel=1.775e-04 MAPE tf=9.3593 torch=9.3593
+WARNING:tensorflow:6 out of the last 8 calls to <function RouteNetGauss.call at 0x738134500430> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+[   7] idx= 1055 n=  4783 targets_identical=True max|Δ|=3.047e-10 scale-rel=6.671e-06 elem-rel=3.404e-05 MAPE tf=10.9590 torch=10.9590
+[   8] idx= 1058 n=  1737 targets_identical=True max|Δ|=5.384e-10 scale-rel=9.918e-06 elem-rel=6.276e-05 MAPE tf=14.7298 torch=14.7298
+[   9] idx= 1061 n=  3544 targets_identical=True max|Δ|=4.629e-10 scale-rel=9.356e-06 elem-rel=5.080e-05 MAPE tf=9.9710 torch=9.9710
+[  10] idx= 1062 n=  1498 targets_identical=True max|Δ|=1.896e-10 scale-rel=4.077e-06 elem-rel=4.462e-05 MAPE tf=13.4930 torch=13.4930
+[  11] idx= 1065 n=  4735 targets_identical=True max|Δ|=5.184e-10 scale-rel=1.033e-05 elem-rel=4.054e-04 MAPE tf=11.5406 torch=11.5406
+[  12] idx= 1066 n=  3565 targets_identical=True max|Δ|=3.897e-10 scale-rel=7.547e-06 elem-rel=2.241e-04 MAPE tf=11.8174 torch=11.8174
+[  13] idx= 1073 n=  1532 targets_identical=True max|Δ|=7.640e-11 scale-rel=1.157e-06 elem-rel=2.521e-06 MAPE tf=12.3066 torch=12.3066
+[  14] idx= 1206 n=  4799 targets_identical=True max|Δ|=2.892e-10 scale-rel=5.235e-06 elem-rel=5.040e-05 MAPE tf=11.3727 torch=11.3727
+[  15] idx= 1212 n=  3576 targets_identical=True max|Δ|=2.037e-10 scale-rel=4.579e-06 elem-rel=4.078e-05 MAPE tf=9.3932 torch=9.3932
+[  16] idx= 1213 n=  4832 targets_identical=True max|Δ|=1.091e-10 scale-rel=1.831e-06 elem-rel=6.189e-06 MAPE tf=8.2868 torch=8.2868
+[  17] idx= 1214 n=  1527 targets_identical=True max|Δ|=1.201e-10 scale-rel=1.697e-06 elem-rel=3.775e-06 MAPE tf=15.5022 torch=15.5022
+[  18] idx= 1218 n=  2613 targets_identical=True max|Δ|=9.095e-11 scale-rel=1.388e-06 elem-rel=1.473e-05 MAPE tf=10.5288 torch=10.5288
+[  19] idx= 1223 n=  3556 targets_identical=True max|Δ|=2.497e-10 scale-rel=4.733e-06 elem-rel=5.118e-05 MAPE tf=11.8991 torch=11.8991
+[  20] idx= 1240 n=  3599 targets_identical=True max|Δ|=2.019e-10 scale-rel=3.895e-06 elem-rel=1.807e-05 MAPE tf=11.0243 torch=11.0243
+[  21] idx= 1241 n=  2586 targets_identical=True max|Δ|=1.346e-10 scale-rel=2.798e-06 elem-rel=2.949e-05 MAPE tf=12.0567 torch=12.0567
+[  22] idx= 1248 n=  3546 targets_identical=True max|Δ|=1.128e-10 scale-rel=2.533e-06 elem-rel=1.919e-05 MAPE tf=10.9202 torch=10.9202
+[  23] idx=  143 n=  1724 targets_identical=True max|Δ|=6.548e-11 scale-rel=9.465e-07 elem-rel=7.129e-06 MAPE tf=11.0559 torch=11.0559
+[  24] idx= 1284 n=  1486 targets_identical=True max|Δ|=1.201e-10 scale-rel=2.489e-06 elem-rel=2.974e-05 MAPE tf=13.5476 torch=13.5476
+[  25] idx= 1285 n=  3536 targets_identical=True max|Δ|=8.004e-11 scale-rel=1.709e-06 elem-rel=1.438e-05 MAPE tf=11.3700 torch=11.3700
+[  26] idx= 1287 n=  4800 targets_identical=True max|Δ|=3.270e-10 scale-rel=6.597e-06 elem-rel=4.665e-05 MAPE tf=11.6152 torch=11.6152
+[  27] idx= 1290 n=  2529 targets_identical=True max|Δ|=3.656e-10 scale-rel=5.453e-06 elem-rel=4.788e-05 MAPE tf=11.6545 torch=11.6545
+[  28] idx=  213 n=  1730 targets_identical=True max|Δ|=3.920e-10 scale-rel=7.678e-06 elem-rel=6.347e-05 MAPE tf=13.2948 torch=13.2948
+[  29] idx=  215 n=  4803 targets_identical=True max|Δ|=9.823e-11 scale-rel=1.956e-06 elem-rel=2.859e-05 MAPE tf=9.0427 torch=9.0427
+[  30] idx=  226 n=  4608 targets_identical=True max|Δ|=3.565e-10 scale-rel=6.466e-06 elem-rel=8.237e-05 MAPE tf=13.2165 torch=13.2165
+[  31] idx=  228 n=  3542 targets_identical=True max|Δ|=1.019e-10 scale-rel=1.928e-06 elem-rel=7.758e-06 MAPE tf=10.8047 torch=10.8047
+[  32] idx=  245 n=  4707 targets_identical=True max|Δ|=4.757e-10 scale-rel=1.007e-05 elem-rel=1.030e-04 MAPE tf=12.9284 torch=12.9284
+[  33] idx=  246 n=  1687 targets_identical=True max|Δ|=1.219e-10 scale-rel=1.810e-06 elem-rel=9.989e-06 MAPE tf=19.7762 torch=19.7762
+[  34] idx= 2629 n=  3570 targets_identical=True max|Δ|=2.865e-10 scale-rel=4.665e-06 elem-rel=3.494e-05 MAPE tf=23.1990 torch=23.1989
+[  35] idx= 2635 n=  3437 targets_identical=True max|Δ|=3.965e-10 scale-rel=8.438e-06 elem-rel=4.789e-05 MAPE tf=11.5485 torch=11.5485
+[  36] idx= 2638 n=  1619 targets_identical=True max|Δ|=1.723e-10 scale-rel=2.669e-06 elem-rel=2.541e-05 MAPE tf=13.0647 torch=13.0647
+[  37] idx= 2640 n=  4691 targets_identical=True max|Δ|=3.201e-10 scale-rel=5.528e-06 elem-rel=6.932e-05 MAPE tf=11.6898 torch=11.6898
+[  38] idx= 2889 n=  4754 targets_identical=True max|Δ|=3.192e-10 scale-rel=6.908e-06 elem-rel=4.109e-05 MAPE tf=9.4899 torch=9.4899
+[  39] idx=  308 n=  3559 targets_identical=True max|Δ|=3.438e-10 scale-rel=5.769e-06 elem-rel=8.374e-05 MAPE tf=12.3971 torch=12.3971
+[  40] idx=  324 n=  3596 targets_identical=True max|Δ|=4.329e-10 scale-rel=9.118e-06 elem-rel=5.587e-05 MAPE tf=8.7515 torch=8.7515
+[  41] idx=  539 n=  1708 targets_identical=True max|Δ|=4.729e-11 scale-rel=9.902e-07 elem-rel=1.071e-05 MAPE tf=10.6318 torch=10.6319
+[  42] idx=  540 n=  3425 targets_identical=True max|Δ|=5.198e-10 scale-rel=1.042e-05 elem-rel=1.337e-04 MAPE tf=17.0920 torch=17.0920
+[  43] idx=  554 n=  1710 targets_identical=True max|Δ|=6.185e-11 scale-rel=1.187e-06 elem-rel=2.599e-06 MAPE tf=9.1333 torch=9.1333
+[  44] idx=  567 n=  1712 targets_identical=True max|Δ|=1.073e-10 scale-rel=1.916e-06 elem-rel=8.682e-06 MAPE tf=14.9478 torch=14.9478
+[  45] idx=  570 n=  4769 targets_identical=True max|Δ|=1.928e-10 scale-rel=3.683e-06 elem-rel=3.094e-05 MAPE tf=9.7736 torch=9.7736
+[  46] idx=  574 n=  3595 targets_identical=True max|Δ|=2.970e-10 scale-rel=5.987e-06 elem-rel=6.655e-05 MAPE tf=9.2887 torch=9.2887
+[  47] idx=  657 n=  3562 targets_identical=True max|Δ|=3.538e-10 scale-rel=6.573e-06 elem-rel=2.343e-04 MAPE tf=11.4932 torch=11.4932
+[  48] idx=  662 n=  3619 targets_identical=True max|Δ|=2.601e-10 scale-rel=5.434e-06 elem-rel=4.353e-05 MAPE tf=12.6310 torch=12.6310
+[  49] idx=  665 n=  4766 targets_identical=True max|Δ|=2.883e-10 scale-rel=4.968e-06 elem-rel=5.550e-05 MAPE tf=12.1196 torch=12.1196
+[  50] idx=  669 n=  3670 targets_identical=True max|Δ|=1.337e-10 scale-rel=2.680e-06 elem-rel=1.834e-04 MAPE tf=9.7007 torch=9.7007
+
+===== L0 forward parity =====
+  n_scenarios                  51
+  n_predictions                174242
+  all_targets_identical        True
+  max_abs_diff                 5.384208634495735e-10
+  worst_scale_rel_diff         1.0423881914180026e-05
+  worst_elem_rel_diff          0.0004053684958455306
+  mape_tf                      11.748960614204407
+  mape_torch                   11.748959124088287
+  tf_seconds_per_scenario      3.8714606995676077
+  torch_seconds_per_scenario   1.2270396784240125
+  passed                       True
+  gt_predictions               {'path': 'tensorflow_version_gt/converged/results/trex_multiburst/RouteNetGauss/jitter/seed_1/predictions.npz', 'same_shape': True, 'tf_vs_gt_bit_identical': False, 'tf_vs_gt_max_abs_diff': 7.3461404781483e-07, 'torch_vs_gt_max_abs_diff': 7.3461404781483e-07, 'targets_vs_gt_bit_identical': True}
+  report -> pytorch_version_results/parity/l0_converged_trex_multiburst_jitter_seed1.json

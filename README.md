@@ -104,6 +104,126 @@ Additional files of the port: `torch_ragged.py` (tf.RaggedTensor stand-ins), `tr
 `tf_reference/replay_tf_run.py` (TF replay recorder), `pytorch_version_results/` (frozen PyTorch
 results mirroring `tensorflow_version_gt/`).
 
+### Was the TensorFlow → PyTorch conversion successful?
+
+**Yes.** The PyTorch port computes the same function as the TensorFlow original, trains with the
+same arithmetic, and reaches the same accuracy on the paper's benchmark. Concretely: loading the
+same weights, the two frameworks agree to ~1e-8 on every prediction of every checkpoint in this
+repository; training from TensorFlow's own initial weights and scenario order, the PyTorch loss
+curve stays inside the envelope TensorFlow shows against *itself*; and trained to convergence,
+three of the four PyTorch runs land inside the pre-registered accuracy gate against the ground
+truth, with the fourth outside it in the *favourable* direction.
+
+What could not be reproduced — and was never reproducible in the first place — is bit-identical
+weights after training. This model's gradients are numerically ill-conditioned, and TensorFlow
+does not reproduce its own weights when only its thread count changes. That is measured, not
+assumed, and it sets the standard everything else is judged against (§0 of
+[PYTORCH_PARITY.md](PYTORCH_PARITY.md)).
+
+#### The evidence
+
+| # | What was checked | Result |
+|---|---|---|
+| 0 | **Is the ground truth reproducible at all?** TF re-run against its own frozen results | 8/8 cells reproduce **bit-for-bit** (every per-epoch checkpoint, `history.csv`, test predictions). With only `TF_NUM_INTRAOP_THREADS=1` changed: **0/34 weight tensors identical** after one epoch, losses still within 3e-5 → the *chaos envelope* |
+| 1 | **Forward pass** — same weights, same scenarios (`parity/run_l0_all.py`) | **16/16 checkpoints pass** (2 converged, 8 quick, 6 paper weights) on their full test sets. Data-pipeline targets **bit-identical**; test MAPE equal to 5–6 significant digits; worst per-scenario deviation 2.7e-4 over 1 796 scenarios |
+| 2 | **Loss, gradients, one Adam step** (`parity/l1_grad_step.py`) | **4/4 configurations pass**. Loss agrees to ≤ 4.4e-6; gradients judged against a float64 reference — where TF's own float32 gradient is meaningful, PyTorch's is at least as close to the truth |
+| 3 | **Exact replay of TF training**, 8 quick cells (`--replay-from`) | **8/8 within gates.** Per-step loss deviation from TF sits *on top of* TF's own thread-count deviation; on delay, 0/250 steps exceed 1e-3 where TF-vs-TF exceeds it 23 times (fig 4) |
+| 4 | **Native PyTorch pipeline**, 8 quick cells (torch init + torch shuffle) | **7/8 within gates**; the miss is `trex_multiburst`/jitter/seed 2, the cell whose objective defeats TF's own reproducibility |
+| 5 | **Converged accuracy**, 4 runs to early stopping | **3/4 inside the gate** (±1 MAPE point, ±0.03 R²); the 4th is outside it by being **better** than the ground truth (table below) |
+| 6 | **Evaluation notebook** (`evaluation_torch.ipynb`) | Runs clean and reproduces the paper's model-vs-simulator tables; its OMNeT++ column is **bit-identical** to TensorFlow's on all six dataset/metric combinations |
+
+#### Converged accuracy — the headline result
+
+`trex_multiburst`, seed 1, trained to early stopping (patience 15) exactly as the TensorFlow
+ground truth was. TF metrics are recomputed from its stored predictions clamped at 0 (see
+*Caveats*).
+
+| target | run | epochs | test MAPE % | Δ | test MAE µs | test R² | Δ | gate |
+|---|---|--:|--:|--:|--:|--:|--:|---|
+| delay | TensorFlow (ground truth) | 45 | 5.037 | — | 6.660 | 0.7402 | — | — |
+| delay | PyTorch, exact replay | 152 | **3.045** | −1.99 | **4.054** | **0.8465** | +0.106 | outside, **better** |
+| delay | PyTorch, torch init | 62 | 4.837 | −0.20 | 6.440 | 0.7397 | −0.0006 | ✅ pass |
+| jitter | TensorFlow (ground truth) | 193 | 11.749 | — | 1.881 | 0.8871 | — | — |
+| jitter | PyTorch, exact replay | 92 | 12.575 | +0.83 | 1.955 | 0.8817 | −0.0054 | ✅ pass |
+| jitter | PyTorch, torch init | 114 | 12.270 | +0.52 | 1.982 | 0.8793 | −0.0079 | ✅ pass |
+
+**Read this carefully rather than as "PyTorch trains better."** Given the same early-stopping
+rule, each run stops wherever its own trajectory stops improving, and these trajectories diverge
+for the float32 reasons above. The delay replay happened to keep finding improvements and ran 152
+epochs against TensorFlow's 45, ending in a better basin. The like-for-like comparison — best
+validation loss *within TensorFlow's own epoch budget* — puts PyTorch marginally **behind**:
+
+| target | TF budget | TF best | PyTorch exact replay | PyTorch torch init |
+|---|--:|--:|--:|--:|
+| delay | 45 epochs | 7.066 | 7.653 (+0.59) | 7.850 (+0.78) |
+| jitter | 193 epochs | 11.635 | 12.134 (+0.50) | 12.176 (+0.54) |
+
+A 0.5–0.8 gap on validation loss is inside this model's run-to-run spread (TensorFlow's own two
+seeds of a quick cell differ by up to 2.8 MAPE points). The fair conclusion: **the port neither
+improved nor degraded learning; it reproduced it, and the endpoints differ by trajectory luck.**
+
+![Converged learning curves](pytorch_version_results/figures/fig1_converged_curves.png)
+
+![Per-step agreement against the chaos envelope](pytorch_version_results/figures/fig4_step_agreement.png)
+
+*Top: the converged runs follow the same trajectory (the flat green segment is the
+initialisation plateau, below). Bottom: the strongest single piece of evidence — PyTorch's
+per-step deviation from TensorFlow (orange) lies on top of TensorFlow's deviation from itself
+under a thread-count change (blue), and past step 200 on delay the latter is larger.*
+
+#### What is *not* identical, and why that is expected
+
+- **Weights after training.** Impossible for any float32 re-implementation here: RouteNet-Gauss
+  back-propagates through 400 recurrent steps per scenario, and at untrained weights the true
+  (float64) gradients reach 1e25, so a float32 gradient is not defined to better than orders of
+  magnitude *in either framework*. `clipnorm=1.0` keeps training stable by following the gradient
+  *direction*, but two implementations differing in the last bit take different paths. TensorFlow
+  against itself, one thread versus four: 0/34 tensors identical after one epoch.
+- **Training curves, after ~70 steps on jitter.** Both frameworks diverge from the reference at
+  the same step with the same magnitude — it is the objective, not the port.
+- **Random draws.** PyTorch's shuffle and initialisation are its own; runs that must match
+  TensorFlow load its recorded order and weights (`--replay-from`).
+
+#### Caveats worth knowing
+
+1. **Initialisation costs warm-up epochs.** Training starts on a val-loss ≈ 86.7 plateau. Keras
+   init escapes it at epoch 6; PyTorch's default init at epoch 21, with the same descent
+   afterwards. Use `--init keras` for TensorFlow-comparable or budget-limited runs
+   ([PYTORCH_PORT.md §5.4](PYTORCH_PORT.md)).
+2. **A latent bug in the original TensorFlow evaluation.** `inference_mode=True` was set *after*
+   training, which never reaches the `tf.function` traces cached during training, so 879 delay and
+   50 jitter test predictions were never clamped at 0. The ground truth's stored delay MAPE is
+   5.075; clamped it is 5.037. The PyTorch code clamps every prediction, and all comparisons here
+   use the clamped ground truth.
+3. **Determinism is opt-in on GPU.** Deterministic algorithms are on by default and **TF32 is
+   disabled** — with TF32 the same forward pass moves by 8e-4 and gradients by 2 %.
+4. **One torch thread per concurrent CPU job.** Oversubscribing the cores is 10–100× slower.
+
+#### Speed
+
+| | TensorFlow | PyTorch |
+|---|--:|--:|
+| training, per step (CPU, this box) | 3.1–4.1 s | 3.7–6.1 s (1.2–1.7× slower) |
+| inference, per test scenario | 4–9 s | **1.2–2.3 s** (3–5× faster) |
+
+PyTorch is slower per training step — the model is hundreds of small ops and eager dispatch
+dominates, which a GPU cannot amortise — and markedly faster at inference, where TensorFlow paid
+to re-trace a graph for every topology.
+
+#### Reproducing the verdict
+
+```bash
+python parity/run_l0_all.py                  # forward parity, all 16 checkpoints
+python parity/l1_grad_step.py --checkpoint … # loss / gradients / one optimizer step
+python parity/check_notebook_eval.py         # the notebook's OMNeT++ column vs TF
+python compare_results.py --tf tensorflow_version_gt --torch results/<experiment>
+python parity/make_figures.py                # the figures above
+```
+
+Full numbers: [PYTORCH_PARITY.md](PYTORCH_PARITY.md) · translation notes and every semantic
+difference: [PYTORCH_PORT.md](PYTORCH_PORT.md) · frozen results:
+[`pytorch_version_results/`](pytorch_version_results/).
+
 ### Glossary
 
 - **Cell** — one combination of the experiment matrix `dataset × target × seed`, e.g.

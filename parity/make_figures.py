@@ -22,7 +22,8 @@ limitations under the License.
 #   fig4_step_agreement.png     Is the exact replay's step-by-step deviation inside the
 #                               envelope TensorFlow shows against *itself* (thread count)?
 #
-# Run in conda env RG_torch from the repo root:
+# Run in conda env RG_torch from the repo root (reads the committed run snapshot under
+# pytorch_version_results/converged/runs/, falling back to the working results/ tree):
 #   python parity/make_figures.py            # writes pytorch_version_results/figures/*.png
 #
 # Palette: the validated 3-hue categorical set (blue/orange/aqua) on the light chart surface;
@@ -41,8 +42,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOGS = os.environ.get("RG_LOG_DIR", "")          # where converged_*.log live (session scratchpad)
 OUT = os.path.join("pytorch_version_results", "figures")
+# Run artifacts are read from the committed snapshot when present, else from the working outputs,
+# so the figures regenerate from a fresh clone (results/ is gitignored).
+RUN_ROOTS = [os.path.join("pytorch_version_results", "converged", "runs"), "results"]
 PERC = ["avg", "p50", "p90", "p95", "p99"]
 
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#d8d8d4"
@@ -76,13 +79,22 @@ def tf_history(target):
     return [int(r["epoch"]) for r in rows], [float(r["val_loss"]) for r in rows]
 
 
-def torch_history(log):
-    """(epochs, val_losses) from a running/finished converged log."""
-    p = os.path.join(LOGS, log)
-    if not os.path.exists(p):
+def run_file(exp, target, name, seed=1):
+    """Path to <name> for a converged run, from the snapshot if present else the working dir."""
+    for root in RUN_ROOTS:
+        p = os.path.join(root, exp, "trex_multiburst", "RouteNetGauss", target, f"seed_{seed}", name)
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def torch_history(exp, target):
+    """(epochs, val_losses) from a converged run's history.csv."""
+    p = run_file(exp, target, "history.csv")
+    if not p:
         return [], []
-    rows = re.findall(r"Epoch (\d+)/300 - \d+s - loss: [\d.]+ - val_loss: ([\d.]+)", open(p, errors="ignore").read())
-    return [int(e) for e, _ in rows], [float(v) for _, v in rows]
+    rows = list(csv.DictReader(open(p)))
+    return [int(r["epoch"]) for r in rows], [float(r["val_loss"]) for r in rows]
 
 
 def annotate_best(ax, xs, ys, color, label):
@@ -99,10 +111,11 @@ def fig1():
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.1))
     series = {
         "delay": [("TensorFlow (ground truth)", TF, *tf_history("delay")),
-                  ("PyTorch, exact replay", TORCH, *torch_history("converged_A_delay.log")),
-                  ("PyTorch, torch init", TORCH_INIT, *torch_history("converged_B_delay.log"))],
+                  ("PyTorch, exact replay", TORCH, *torch_history("torch_converged", "delay")),
+                  ("PyTorch, torch init", TORCH_INIT, *torch_history("torch_converged_torchinit", "delay"))],
         "jitter": [("TensorFlow (ground truth)", TF, *tf_history("jitter")),
-                   ("PyTorch, exact replay", TORCH, *torch_history("converged_A_jitter.log"))],
+                   ("PyTorch, exact replay", TORCH, *torch_history("torch_converged", "jitter")),
+                   ("PyTorch, torch init", TORCH_INIT, *torch_history("torch_converged_torchinit", "jitter"))],
     }
     for ax, target in zip(axes, ["delay", "jitter"]):
         for label, color, xs, ys in series[target]:
@@ -128,7 +141,12 @@ def fig2():
     def load(path):
         return json.load(open(path)) if os.path.exists(path) else None
 
-    H = "pytorch_version_results/converged/harvest"
+    def run_metrics(exp, target):
+        p = run_file(exp, target, "metrics.json")
+        if p:
+            return json.load(open(p))
+        h = f"pytorch_version_results/converged/harvest/{exp}/{target}/metrics.json"   # in-progress fallback
+        return json.load(open(h)) if os.path.exists(h) else None
     data = {}
     for target in ["delay", "jitter"]:
         gt = load(f"tensorflow_version_gt/converged/results/trex_multiburst/RouteNetGauss/{target}/seed_1/metrics.json")
@@ -138,9 +156,10 @@ def fig2():
         gt_clamped = {n: {"mape": float(np.mean(np.abs((yt[:, i] - yp[:, i]) / yt[:, i])) * 100),
                           "r2": float(1 - np.sum((yt[:, i] - yp[:, i]) ** 2) / np.sum((yt[:, i] - yt[:, i].mean()) ** 2))}
                       for i, n in enumerate(PERC)}
+        er = run_metrics("torch_converged", target)
         data[target] = {"TensorFlow (ground truth)": (TF, gt_clamped),
-                        "PyTorch, exact replay": (TORCH, (load(f"{H}/torch_converged/{target}/metrics.json") or {}).get("test_per_percentile"))}
-        ti = load(f"{H}/torch_converged_torchinit/{target}/metrics.json")
+                        "PyTorch, exact replay": (TORCH, (er or {}).get("test_per_percentile"))}
+        ti = run_metrics("torch_converged_torchinit", target)
         if ti:
             data[target]["PyTorch, torch init"] = (TORCH_INIT, ti["test_per_percentile"])
 
@@ -229,7 +248,8 @@ def fig4():
         gt = steps(f"tensorflow_version_gt/replay/trex_multiburst/RouteNetGauss/{target}/seed_1/step_losses_5x50.csv")
         suffix = "_5ep" if target == "delay" else ""
         tf1 = steps(f"{F}/tf_1thread_step_losses_trex_multiburst_{target}_seed1{suffix}.csv")
-        tt = steps(os.path.join(LOGS, "").replace("logs", "") and f"results/torch_converged/trex_multiburst/RouteNetGauss/{target}/seed_1/step_losses.csv")
+        p = run_file("torch_converged", target, "step_losses.csv")
+        tt = steps(p) if p else None
         if gt is None or tt is None:
             continue
         panels.append((target, gt, tf1, tt))
