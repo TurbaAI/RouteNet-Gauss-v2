@@ -51,10 +51,10 @@ and checkpoint conversion and for the side-by-side parity harness in `parity/`.
 | `tf.zeros`, `tf.concat`, `tf.squeeze`, `tf.cast` | `torch.zeros`, `torch.cat`, `.squeeze`, `.to(dtype)` | |
 | int32 index tensors | `.long()` at the top of `forward` | data stays int32 on disk (as in TF); torch indexing needs int64 |
 
-Initialisation: `RouteNetGauss(init="torch")` (default) keeps PyTorch's defaults;
-`init="keras"` re-initialises with the Keras defaults RouteNet-Gauss was trained with
-(glorot-uniform kernels, orthogonal recurrent kernels, zero biases) — used by the TF-comparison
-runs. Both only fix the *distribution*; the exact-replay experiments load TF's actual initial
+Initialisation: `RouteNetGauss(init="keras")` (default) initialises with the Keras defaults
+RouteNet-Gauss was trained with (glorot-uniform kernels, orthogonal recurrent kernels, zero
+biases); `init="torch"` keeps PyTorch's defaults. Both only fix the *distribution* (the Keras one is
+checked against the TF initialisers, §5.4); the exact-replay experiments load TF's actual initial
 weights (`tensorflow_version_gt/replay/**/init_weights.npz`) through the same converter.
 
 ## 3. Data pipeline (`utils.py`, `data_torch/`)
@@ -126,26 +126,41 @@ torch_adam` is available to use `torch.optim.Adam(eps=1e-7)` instead.
 
 ### 5.4 Initialisation
 Keras: glorot-uniform kernels, orthogonal recurrent kernels, zero biases. PyTorch: kaiming-uniform
-Linear weights with uniform biases; uniform(±1/√H) for all GRU tensors. `--init keras` selects
-the Keras scheme; the default is `torch`. All TF-comparison runs pass `--init keras` explicitly
-and record it in `metrics.json`.
+Linear weights with uniform biases; uniform(±1/√H) for all GRU tensors. The default is `--init
+keras` — the TF original's scheme, drawn by PyTorch's RNG — in `models.py`, `experiment.py`,
+`run_experiments.py` and `train.py` since 2026-09-28 (it was `torch` before; the measurement below
+is why it changed). `--init torch` selects PyTorch's scheme. Every run records its init in
+`metrics.json`.
 
-**Measured consequence (trex_multiburst / delay / seed 1, 500 steps per epoch).** Training starts
-on a plateau at val_loss ≈ 86.7 that the model has to escape before it learns anything. The
-initialisation decides *when* that happens, not whether:
+**The Keras scheme is checked, not assumed** (`parity/check_keras_init.py`, report
+`pytorch_version_results/parity/keras_init_check.md`). No training run had used it before it became
+the default, because every exact replay loads TF's recorded weights. For all 38 parameter tensors,
+16 PyTorch draws are compared with the TF initial weights recorded by the replay recorder (the 8
+cells hold 2 distinct draws, one per seed) and with 16 fresh draws of the Keras initialisers
+themselves: every tensor is re-initialised, biases are exactly 0, glorot kernels stay within
+±√(6/(fan_in+fan_out)) with the expected standard deviation, recurrent kernels are orthogonal to
+6e-7 (the recorded TF ones to 5e-7, which also validates the converter's GRU layout), and the
+two-sample Kolmogorov–Smirnov p-values against both references are all ≥ 0.024.
 
-| init | plateau exit | val_loss over the next epochs | best val_loss |
-|---|--:|---|--:|
-| Keras (TF ground truth) | epoch **6** | 49.6 → 21.5 → 15.6 → 12.7 | 7.07 (epoch 30) |
-| PyTorch default | epoch **21** | 56.4 → 21.7 → 22.2 → 18.5 | (run in progress) |
+**Measured consequence (trex_multiburst / delay / seed 1, 500 steps per epoch; epochs 0-based as in
+`history.csv`).** Training starts on a plateau at val_loss ≈ 86.7 that the model has to escape
+before it learns anything. The initialisation decides *when* that happens:
 
-The descent dynamics after the break are nearly identical; PyTorch's default init simply spends
-~15 more epochs (~10 h of CPU training here) on the plateau, and en route it also produced a
-transient divergence (train loss 86 → 106 at epochs 7-9) that the Keras init did not. Short runs
-cannot see this — the quick 5×50 set never leaves the plateau at all, and its native-init cells
-still match TF to within ±0.3 MAPE points. **Recommendation: keep `--init keras` for anything
-compared against the TF results or trained on a budget; the `torch` default is fine but pay for
-it in warm-up epochs.**
+| init | run | plateau exit | val_loss over the next epochs | best val_loss |
+|---|---|--:|---|--:|
+| Keras (TF's recorded weights) | TF ground truth | epoch **6** | 49.6 → 21.5 → 15.6 → 12.7 | 7.07 (epoch 29) |
+| Keras (TF's recorded weights) | PyTorch exact replay | epoch **2** | 42.1 → 24.2 → 18.8 → 25.2 | 4.98 (epoch 136) |
+| PyTorch default | PyTorch, torch init | epoch **20** | 56.4 → 21.7 → 22.2 → 18.5 | 6.61 (epoch 46) |
+
+The torch-init run escaped on the last epoch it had. Early stopping (patience 15, counted from
+epoch 4) held its best value at epoch 5 (86.672) with 14 non-improving epochs behind it when epoch
+20 finally improved; one more flat epoch and the run would have stopped and restored the plateau
+model (val MAPE ≈ 87 %). On the way it also went through a transient divergence (train loss
+86 → 106 at epochs 6–8) that the Keras-initialised runs did not. The descent after the break is
+the same. Short runs cannot see any of this — the quick 5×50 set never leaves the plateau, and its
+native-init cells still match TF to within ±0.3 MAPE points. Runs without early stopping (e.g.
+`train.py`, 300 fixed epochs) only lose the ~14 plateau epochs; runs with it (the converged
+configuration, `--patience 15`) can end with an untrained model.
 
 ### 5.5 Shuffle order and z-scores
 See §3. In the TF pipeline the z-score step consumes the first shuffled pass and `model.fit` the
@@ -216,4 +231,5 @@ as bit-identical weights.
 | `convert_tf_checkpoint.py` | TF ↔ torch weight mapping (pure re-layout) |
 | `parity/l0_forward.py`, `parity/run_l0_all.py` | forward-pass parity on every checkpoint's test set; data-pipeline targets bit-identical |
 | `parity/l1_grad_step.py` | loss, gradient (vs float64 reference) and one-Adam-step parity |
+| `parity/check_keras_init.py` | the default `init="keras"` draws from the same distributions as the Keras initialisers (vs the recorded TF weights and fresh Keras draws) |
 | `compare_results.py` | training outcomes vs the GT, per cell, with the agreed gates; per-step curves for exact replays |

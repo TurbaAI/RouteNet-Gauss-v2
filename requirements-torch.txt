@@ -15,6 +15,7 @@
 # PyTorch do not import TensorFlow.
 tensorflow-cpu==2.15.0
 numpy==1.26.3          # TF 2.15 needs numpy<2; torch 2.13 works with 1.26
+tensorboard==2.15.2    # torch.utils.tensorboard needs it (tensorflow-cpu would pull it in too)
 wandb==0.28.0
 notebook==7.6.2
 pandas==2.3.3

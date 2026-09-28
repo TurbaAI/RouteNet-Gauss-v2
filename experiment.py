@@ -187,8 +187,9 @@ def parse_args():
     g.add_argument("--allow-tf32", action="store_true",
                    help="allow TensorFloat-32 kernels on Ampere+ GPUs (default off: 10-bit-mantissa arithmetic "
                         "breaks float32 parity with TensorFlow)")
-    g.add_argument("--init", choices=["torch", "keras"], default="torch",
-                   help="parameter initialisation: torch default, or Keras' glorot/orthogonal/zeros (TF comparisons)")
+    g.add_argument("--init", choices=["torch", "keras"], default="keras",
+                   help="parameter initialisation: Keras' glorot/orthogonal/zeros as in the TF original (default), "
+                        "or PyTorch's own defaults (leave the initial plateau much later, PYTORCH_PORT.md §5.4)")
     g.add_argument("--init-weights", default=None, help="load initial weights (.pt state_dict or TF init_weights.npz)")
     g.add_argument("--sample-order", default=None,
                    help="sample_order.npy: feed the training scenarios in exactly this sample_idx order (exact TF replay)")

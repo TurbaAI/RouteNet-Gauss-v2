@@ -164,7 +164,7 @@ raw results: `pytorch_version_results/quick/torch_baseline/`.
 
 ### 4.1 Quick 5×50 set, 8 cells (`torch_baseline_torchinit`) — 7/8 pass
 
-PyTorch default init + PyTorch's own seeded shuffle: two runs with the same seed number are
+PyTorch default init (`--init torch`, the default until 2026-09-28) + PyTorch's own seeded shuffle: two runs with the same seed number are
 *independent random draws* in the two frameworks, so the per-seed pairing below is convention,
 not correspondence. Gate: MAPE within ±3 pt of the paired GT cell, R² within 2× the TF seed
 spread.
@@ -278,3 +278,75 @@ Training: torch is ~1.2–1.7× slower per step than TF-CPU on this 4-core box (
 hundreds of small ops per step; eager dispatch overhead dominates and the GPU cannot amortise
 it). Inference: torch is 3–5× faster. One operational rule matters more than any of this:
 **one torch thread per concurrent CPU job** — oversubscription costs 10–100×.
+
+## 7. Reliability verification (2026-09-28) — rules fixed before the runs
+
+After §5, three things were still argued rather than measured:
+
+1. whether the converged-scale differences — the delay exact replay at 3.05 test MAPE against TF's
+   5.04, and all four PyTorch runs 0.5–0.8 validation points behind TF at TF's own epoch budget —
+   are within the noise TF shows against itself;
+2. whether the PyTorch *defaults* reproduce TF: the torch-init delay run left the val≈86.7 plateau
+   on the last epoch before early stopping would have ended it (PYTORCH_PORT.md §5.4), so the
+   default init is now `keras`;
+3. whether that new default — no training run had used it before — trains like TF.
+
+The rules below were written down and committed before any of the runs produced a result. Epochs
+are 0-based, as in `history.csv`; TF test metrics use clamped predictions (§1). Scripts, logs and a
+progress table (`status.py`) live in `results/verification/` (not committed); frozen results go to
+`pytorch_version_results/verification/`.
+
+### 7.1 Keras-init distributions — passed
+
+`parity/check_keras_init.py` (details in PYTORCH_PORT.md §5.4, report
+[`pytorch_version_results/parity/keras_init_check.md`](pytorch_version_results/parity/keras_init_check.md)):
+all 38 tensors re-initialised; biases exactly 0; glorot bounds and standard deviations as expected;
+recurrent kernels orthogonal to 5.7e-7 (TF's recorded ones 4.7e-7); KS p ≥ 0.045 against TF's
+recorded weights and ≥ 0.024 against fresh Keras draws.
+
+### 7.2 TF against itself at converged scale
+
+Run: the TF converged delay ground-truth command (frozen code at `2e30d5d`, CPU, shuffle buffer
+200, patience 15, best-only checkpoint), unchanged except `TF_NUM_INTRAOP_THREADS=1`. Setup check
+first: one epoch of the same command with the ground truth's threading must reproduce its epoch-0
+`history.csv` row bit for bit, so that any later difference comes from the thread count alone.
+
+Measured against the ground truth: (i) plateau-exit epoch (ground truth 6, PyTorch exact replay 2)
+— reported, not gated; (ii) best val_loss within the ground truth's 45 epochs (7.066; PyTorch exact
+replay +0.59); (iii) test MAPE at early stopping (5.037; PyTorch exact replay 3.045).
+
+- **Confirmed** if TF moves by at least half of PyTorch's deviation: |Δ(ii)| ≥ 0.3 or
+  |Δ(iii)| ≥ 1 MAPE point. The §5 differences are then TF-sized and the verdict stands.
+- **Suspect** if |Δ(ii)| ≤ 0.1 and |Δ(iii)| ≤ 0.3: TF agrees with itself far more closely than
+  PyTorch agrees with TF, and the cause is diagnosed before the verdict stands.
+- **Inconclusive** otherwise, reported as such.
+
+### 7.3 The new default pipeline, trained to convergence
+
+Run: `experiment.py` with its defaults — `init=keras` drawn by PyTorch's RNG, PyTorch's own shuffle,
+no TF input — on the ground truth's converged config, `trex_multiburst`/delay/seed 1, GPU.
+
+- **Pass** if test MAPE is within ±1 point and R² within ±0.03 of the ground truth. A result outside
+  that band passes only if §7.2 shows TF itself moving that far.
+
+### 7.4 Plateau test across seeds
+
+Runs: seeds 2 and 3, the first 25 epochs of the converged config, in TF (frozen code, one thread)
+and in PyTorch with the new default; seed 1 comes from the ground truth and from §7.3.
+
+- **Pass** if no PyTorch run is early-stopped on the plateau and none leaves it more than 5 epochs
+  after the latest TF seed. A TF seed that stays on the plateau itself is recorded as a property of
+  the original model, and PyTorch is judged against it.
+
+### 7.5 Re-checks in today's environment
+
+`train.py` smoke run (2 epochs × 5 steps, its visualization call included), `describe_dataset` on
+one sample, and L0 re-run on three checkpoints (converged trex delay, paper mawi delay, paper
+trex_multiburst_filtered delay) compared field by field with the committed reports.
+
+- `train.py` (a copy with only `EPOCHS, STEPS_PER_EPOCH = 2, 5`, the experiment name and the
+  visualization output folder changed; `mawi_pcaps`/delay, GPU, new default init): **passed** — the
+  visualization call rendered its topology and summary, both epochs trained, validated (val_loss
+  88.655, 88.653: still on the plateau, as expected after 10 steps) and checkpointed, exit 0.
+- `python -m visualization.describe_dataset --dataset mawi_pcaps --partition test --samples 0`:
+  **passed** (exit 0).

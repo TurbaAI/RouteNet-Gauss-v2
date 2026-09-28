@@ -13,6 +13,37 @@ This enables it to understand and generalize to different network configurations
 
 ## Quick start
 
+This branch is the **PyTorch** version of RouteNet-Gauss (see [PyTorch port](#pytorch-port)). The
+original TensorFlow code is kept alongside it; its instructions follow in
+[TensorFlow original](#tensorflow-original).
+
+```bash
+conda create -y -n RG_torch python=3.10 && conda activate RG_torch
+pip install "torch==2.13.0" --index-url https://download.pytorch.org/whl/cu126   # see requirements-torch.txt for why cu126
+pip install -r requirements-torch.txt
+
+python experiment.py --dataset trex_multiburst --target delay --seed 1 --epochs 5 --steps 50 --experiment-name my_run   # one job
+python run_experiments.py --experiment-name my_matrix --epochs 5 --steps 50                                             # the 2x2x2 matrix
+python train.py                                                                                                        # the paper's single-run config
+jupyter notebook evaluation_torch.ipynb                                                                                # evaluate checkpoints
+```
+
+Datasets are read from `data_torch/` (a lossless, TF-free conversion of `data/`, see
+[`data_torch/README.md`](data_torch/README.md)); TensorFlow is **not** needed to train or evaluate.
+Important runtime notes: one torch thread per concurrent CPU job (`--threads`, oversubscription is
+10–100× slower), GPU runs are deterministic and TF32 is disabled by default, parameters are
+initialised with the TF original's (Keras) initialisers by default (`--init keras`), and every run
+writes `resume.pt` so it can be continued with `--resume`. To reproduce the TF ground truth
+exactly, pass `--replay-from tensorflow_version_gt/replay/<dataset>/RouteNetGauss/<target>/seed_<n>`
+(TF's own initial weights, scenario order and z-scores).
+
+### TensorFlow original
+
+The TensorFlow implementation is kept for reference: `tf_reference/` (model, data pipeline and
+training helpers, frozen), [`evaluation.ipynb`](evaluation.ipynb), the datasets in `data/`, and the
+TF versions of `train.py`, `experiment.py` and `run_experiments.py` at commit `2e30d5d` (branch
+`main`). Its original instructions, unchanged:
+
 1. Please ensure that your OS has installed Python 3 (ideally 3.9)
 2. Create the virtual environment and activate the environment:
 ```bash
@@ -45,6 +76,13 @@ The repository contains the following structure:
 - [`utils.py`](utils.py) contains auxiliary functions common in the previous files.
 - [LICENSE](LICENSE): see the file for the full license.
 
+On this branch `models.py`, `train.py` and `utils.py` — and `experiment.py`, `run_experiments.py`
+and `training_lib.py`, which the TF baseline pipeline added — are the PyTorch versions, and every
+checkpoint in `ckpt` has a converted `.pt` next to it. The port adds `data_torch/` (the datasets
+for PyTorch), [`evaluation_torch.ipynb`](evaluation_torch.ipynb), `torch_ragged.py`, the two
+converters, `parity/`, `tf_reference/`, `tensorflow_version_gt/` and `pytorch_version_results/`
+(see [PyTorch port](#pytorch-port)).
+
 ## Datasets information
 
 In the `data` folder, we can find all the variants of the three datasets used in the paper. Inside each directory, data is split according to the training, validation, and test splits. Then each partition is subdivided into shards, to keep the repository's file size under git and GitHub's limits. *NOTE*: please use the `load_dataset` function from `utils.py` to load these shards correctly. The datasets go as follows:
@@ -58,15 +96,19 @@ In the `data` folder, we can find all the variants of the three datasets used in
 - `trex_synthetic_filtered`: a subset of samples from `trex_synthetic`. Experiments showed that delay models trained from the subset were more accurate later during the evaluation. This includes only training and validation (the test partition is the same as `trex_synthetic`).
 - `trex_synthetic_simulated`: version of the `trex_synthetic` but run with OMNeT++ simulator. Only includes test partition.
 
+On this branch `utils.load_dataset` reads the PyTorch copies of these datasets in `data_torch/`
+(same partitions and shards); the TF originals in `data/` are read by `tf_reference/utils.py`.
+
 ## Modifying the `train.py` script
 
 The script contains the default hyperparameters and configurations used in the paper. Follow the comments in the code to perform your modifications. In a summary:
 
-- Use the `RUN_EAGERLY` variable (line 36) to run TensorFlow in eager mode.
-- Use the `RELOAD_WEIGHTS` variable (line 39) to resume training from the latest recorded checkpoint.
-- Modify the experiment configuration to change aspects such as the dataset used (lines 204-219)
-- Change the optimizer (and its hyperparameters) and the loss function on lines 231 and 232, respectively.
-- Model definition and the remainder of its hyperparameters can be changed on its instantiation (lines 233-245) and the call to fit the model (lines 295-307)
+- The `RUN_EAGERLY` variable (line 66) ran TensorFlow in eager mode; PyTorch always runs eagerly, so it is kept for structural parity only.
+- Use the `RELOAD_WEIGHTS` variable (line 69) to resume training from the latest recorded checkpoint.
+- PyTorch-only settings — device, CPU threads and the initialisation scheme (`INIT`, default `"keras"`) — are on lines 71-78.
+- Modify the experiment configuration to change aspects such as the dataset used (lines 87-104)
+- Change the optimizer (and its hyperparameters) and the loss function on lines 153 and 154, respectively.
+- Model definition and the remainder of its hyperparameters can be changed on its instantiation (lines 138-151) and the call to fit the model (lines 258-274)
 
 ## PyTorch port
 
@@ -77,28 +119,7 @@ The port was verified against the frozen TensorFlow results in `tensorflow_versi
 [PYTORCH_PORT.md](PYTORCH_PORT.md) (how it was translated, every semantic difference) and
 [PYTORCH_PARITY.md](PYTORCH_PARITY.md) (the measured agreement).
 
-### Quick start (PyTorch)
-
-```bash
-conda create -y -n RG_torch python=3.10 && conda activate RG_torch
-pip install "torch==2.13.0" --index-url https://download.pytorch.org/whl/cu126   # see requirements-torch.txt for why cu126
-pip install -r requirements-torch.txt
-
-python experiment.py --dataset trex_multiburst --target delay --seed 1 --epochs 5 --steps 50 --experiment-name my_run   # one job
-python run_experiments.py --experiment-name my_matrix --epochs 5 --steps 50                                             # the 2x2x2 matrix
-python train.py                                                                                                        # the paper's single-run config
-jupyter notebook evaluation_torch.ipynb                                                                                # evaluate checkpoints
-```
-
-Datasets are read from `data_torch/` (a lossless, TF-free conversion of `data/`, see
-[`data_torch/README.md`](data_torch/README.md)); TensorFlow is **not** needed to train or evaluate.
-Important runtime notes: one torch thread per concurrent CPU job (`--threads`, oversubscription is
-10–100× slower), GPU runs are deterministic and TF32 is disabled by default, and every run writes
-`resume.pt` so it can be continued with `--resume`. To reproduce the TF ground truth exactly, pass
-`--replay-from tensorflow_version_gt/replay/<dataset>/RouteNetGauss/<target>/seed_<n>` (TF's own
-initial weights, scenario order and z-scores).
-
-Additional files of the port: `torch_ragged.py` (tf.RaggedTensor stand-ins), `training_lib.py`
+Setup and commands: [Quick start](#quick-start). Additional files of the port: `torch_ragged.py` (tf.RaggedTensor stand-ins), `training_lib.py`
 (Keras-exact loss, Adam, callbacks and training loop), `convert_data_to_torch.py`,
 `convert_tf_checkpoint.py`, `compare_results.py`, `parity/` (L0/L1 harness),
 `tf_reference/replay_tf_run.py` (TF replay recorder), `pytorch_version_results/` (frozen PyTorch
@@ -186,10 +207,13 @@ under a thread-count change (blue), and past step 200 on delay the latter is lar
 
 #### Caveats worth knowing
 
-1. **Initialisation costs warm-up epochs.** Training starts on a val-loss ≈ 86.7 plateau. Keras
-   init escapes it at epoch 6; PyTorch's default init at epoch 21, with the same descent
-   afterwards. Use `--init keras` for TensorFlow-comparable or budget-limited runs
-   ([PYTORCH_PORT.md §5.4](PYTORCH_PORT.md)).
+1. **Initialisation decides when training leaves its starting plateau.** Delay training starts on
+   a val-loss ≈ 86.7 plateau. With the TF original's (Keras) initialisers it left at epoch 6 in TF
+   and epoch 2 in the PyTorch exact replay; with PyTorch's own default init only at epoch 20 —
+   the last epoch before early stopping (patience 15) would have ended the run with the untrained
+   plateau model (epochs 0-based). The default is therefore `--init keras` — the Keras
+   initialisers drawn by PyTorch's RNG, checked against TF's by `parity/check_keras_init.py` —
+   and `--init torch` remains available ([PYTORCH_PORT.md §5.4](PYTORCH_PORT.md)).
 2. **A latent bug in the original TensorFlow evaluation.** `inference_mode=True` was set *after*
    training, which never reaches the `tf.function` traces cached during training, so 879 delay and
    50 jitter test predictions were never clamped at 0. The ground truth's stored delay MAPE is

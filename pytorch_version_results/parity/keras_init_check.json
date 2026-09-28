@@ -1,0 +1,745 @@
+{
+  "summary": {
+    "passed": true,
+    "torch_draws": 16,
+    "tf_recorded_distinct_draws": 2,
+    "tf_recorded_cells": {
+      "c3f90fdb95": [
+        "mawi_pcaps/RouteNetGauss/delay/seed_1",
+        "mawi_pcaps/RouteNetGauss/jitter/seed_1",
+        "trex_multiburst/RouteNetGauss/delay/seed_1",
+        "trex_multiburst/RouteNetGauss/jitter/seed_1"
+      ],
+      "a878cdf940": [
+        "mawi_pcaps/RouteNetGauss/delay/seed_2",
+        "mawi_pcaps/RouteNetGauss/jitter/seed_2",
+        "trex_multiburst/RouteNetGauss/delay/seed_2",
+        "trex_multiburst/RouteNetGauss/jitter/seed_2"
+      ]
+    },
+    "keras_reference_draws": 16,
+    "tensors": 38,
+    "min_ks_p_vs_tf": 0.04521978928774012,
+    "min_ks_p_vs_keras": 0.02437017468941795,
+    "max_torch_ortho_err": 5.715982456244717e-07,
+    "max_tf_ortho_err": 4.7184155305135533e-07,
+    "gates": {
+      "ks_p_min": 0.0001,
+      "ortho_tol": 1e-05,
+      "std_sigmas": 5.0
+    },
+    "torch_version": "2.13.0+cu126"
+  },
+  "tensors": [
+    {
+      "tensor": "flow_update.weight_ih_l0",
+      "kind": "glorot",
+      "shape": [
+        96,
+        64
+      ],
+      "torch_std": 0.11191287636756897,
+      "tf_std": 0.11163628846406937,
+      "keras_std": 0.1119055449962616,
+      "limit": 0.19364916731037085,
+      "expected_std": 0.1118033988749895,
+      "torch_max_abs": 0.19364909827709198,
+      "tf_max_abs": 0.19364875555038452,
+      "ks_vs_tf_D": 0.00685628255208337,
+      "ks_vs_tf_p": 0.6821238103869033,
+      "ks_vs_keras_D": 0.002461751302083315,
+      "ks_vs_keras_p": 0.9267059290349328,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_update.weight_hh_l0",
+      "kind": "orthogonal",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.10206074267625809,
+      "tf_std": 0.10205362737178802,
+      "keras_std": 0.10206142067909241,
+      "torch_ortho_err": 4.718278086013328e-07,
+      "tf_ortho_err": 4.2204494699049633e-07,
+      "ks_vs_tf_D": 0.012410481770833315,
+      "ks_vs_tf_p": 0.36749697023245087,
+      "ks_vs_keras_D": 0.00478108723958337,
+      "ks_vs_keras_p": 0.6270063894707999,
+      "checks": {
+        "orthogonal": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_update.bias_ih_l0",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_update.bias_hh_l0",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_update.weight_ih",
+      "kind": "glorot",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.12507714331150055,
+      "tf_std": 0.1250309944152832,
+      "keras_std": 0.12567545473575592,
+      "limit": 0.21650635094610965,
+      "expected_std": 0.125,
+      "torch_max_abs": 0.21650585532188416,
+      "tf_max_abs": 0.21650102734565735,
+      "ks_vs_tf_D": 0.018595377604166685,
+      "ks_vs_tf_p": 0.04521978928774012,
+      "ks_vs_keras_D": 0.00815836588541663,
+      "ks_vs_keras_p": 0.07551295507627923,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_update.weight_hh",
+      "kind": "orthogonal",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.10206061601638794,
+      "tf_std": 0.10206029564142227,
+      "keras_std": 0.10206149518489838,
+      "torch_ortho_err": 5.715982456244717e-07,
+      "tf_ortho_err": 4.044491599408673e-07,
+      "ks_vs_tf_D": 0.01289876302083337,
+      "ks_vs_tf_p": 0.3216325317219742,
+      "ks_vs_keras_D": 0.004923502604166685,
+      "ks_vs_keras_p": 0.5895622801666474,
+      "checks": {
+        "orthogonal": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_update.bias_ih",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_update.bias_hh",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_update.weight_ih",
+      "kind": "glorot",
+      "shape": [
+        96,
+        64
+      ],
+      "torch_std": 0.11174826323986053,
+      "tf_std": 0.11206944286823273,
+      "keras_std": 0.1116829439997673,
+      "limit": 0.19364916731037085,
+      "expected_std": 0.1118033988749895,
+      "torch_max_abs": 0.19364827871322632,
+      "tf_max_abs": 0.19364090263843536,
+      "ks_vs_tf_D": 0.00597127278645837,
+      "ks_vs_tf_p": 0.829857607925357,
+      "ks_vs_keras_D": 0.0022074381510416713,
+      "ks_vs_keras_p": 0.9701754410150365,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_update.weight_hh",
+      "kind": "orthogonal",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.10206174850463867,
+      "tf_std": 0.1020602434873581,
+      "keras_std": 0.10206201672554016,
+      "torch_ortho_err": 5.018936635181603e-07,
+      "tf_ortho_err": 4.1694874775011215e-07,
+      "ks_vs_tf_D": 0.01070149739583337,
+      "ks_vs_tf_p": 0.5569663279769822,
+      "ks_vs_keras_D": 0.00437418619791663,
+      "ks_vs_keras_p": 0.7339743124134833,
+      "checks": {
+        "orthogonal": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_update.bias_ih",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_update.bias_hh",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_update.weight_ih",
+      "kind": "glorot",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.12479891628026962,
+      "tf_std": 0.1248449757695198,
+      "keras_std": 0.12511901557445526,
+      "limit": 0.21650635094610965,
+      "expected_std": 0.125,
+      "torch_max_abs": 0.21649576723575592,
+      "tf_max_abs": 0.2164984941482544,
+      "ks_vs_tf_D": 0.01564534505208337,
+      "ks_vs_tf_p": 0.13675199692764492,
+      "ks_vs_keras_D": 0.0052490234375,
+      "ks_vs_keras_p": 0.5064095497420049,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_update.weight_hh",
+      "kind": "orthogonal",
+      "shape": [
+        96,
+        32
+      ],
+      "torch_std": 0.10206174850463867,
+      "tf_std": 0.10206026583909988,
+      "keras_std": 0.10206151753664017,
+      "torch_ortho_err": 5.431439671355065e-07,
+      "tf_ortho_err": 4.7184155305135533e-07,
+      "ks_vs_tf_D": 0.00954182942708337,
+      "ks_vs_tf_p": 0.700709502974402,
+      "ks_vs_keras_D": 0.0032552083333333426,
+      "ks_vs_keras_p": 0.9566833590758973,
+      "checks": {
+        "orthogonal": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_update.bias_ih",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_update.bias_hh",
+      "kind": "zero",
+      "shape": [
+        96
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_embedding.0.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        3
+      ],
+      "torch_std": 0.238580584526062,
+      "tf_std": 0.24159389734268188,
+      "keras_std": 0.24074868857860565,
+      "limit": 0.4140393356054125,
+      "expected_std": 0.23904572186687872,
+      "torch_max_abs": 0.41396448016166687,
+      "tf_max_abs": 0.41330569982528687,
+      "ks_vs_tf_D": 0.04361979166666667,
+      "ks_vs_tf_p": 0.895028265723792,
+      "ks_vs_keras_D": 0.01953125,
+      "ks_vs_keras_p": 0.9290150792448815,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_embedding.0.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_embedding.2.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        32
+      ],
+      "torch_std": 0.17707985639572144,
+      "tf_std": 0.17567545175552368,
+      "keras_std": 0.17792609333992004,
+      "limit": 0.30618621784789724,
+      "expected_std": 0.17677669529663687,
+      "torch_max_abs": 0.3061358332633972,
+      "tf_max_abs": 0.30559852719306946,
+      "ks_vs_tf_D": 0.0196533203125,
+      "ks_vs_tf_p": 0.4791686869018094,
+      "ks_vs_keras_D": 0.00830078125,
+      "ks_vs_keras_p": 0.623284347211167,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "flow_embedding.2.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_embedding.0.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        3
+      ],
+      "torch_std": 0.2344134896993637,
+      "tf_std": 0.25030243396759033,
+      "keras_std": 0.23438070714473724,
+      "limit": 0.4140393356054125,
+      "expected_std": 0.23904572186687872,
+      "torch_max_abs": 0.4139755666255951,
+      "tf_max_abs": 0.4138493239879608,
+      "ks_vs_tf_D": 0.0625,
+      "ks_vs_tf_p": 0.5048074542415308,
+      "ks_vs_keras_D": 0.03515625,
+      "ks_vs_keras_p": 0.29360724835025925,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_embedding.0.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_embedding.2.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        32
+      ],
+      "torch_std": 0.17715871334075928,
+      "tf_std": 0.1785072684288025,
+      "keras_std": 0.17743493616580963,
+      "limit": 0.30618621784789724,
+      "expected_std": 0.17677669529663687,
+      "torch_max_abs": 0.3061762750148773,
+      "tf_max_abs": 0.3061017096042633,
+      "ks_vs_tf_D": 0.01953125,
+      "ks_vs_tf_p": 0.4872531022030012,
+      "ks_vs_keras_D": 0.0107421875,
+      "ks_vs_keras_p": 0.299410348713351,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "queue_embedding.2.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_embedding.0.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        1
+      ],
+      "torch_std": 0.23677362501621246,
+      "tf_std": 0.2479233592748642,
+      "keras_std": 0.24029839038848877,
+      "limit": 0.4264014327112209,
+      "expected_std": 0.24618298195866548,
+      "torch_max_abs": 0.42529910802841187,
+      "tf_max_abs": 0.41570955514907837,
+      "ks_vs_tf_D": 0.173828125,
+      "ks_vs_tf_p": 0.05677870922830107,
+      "ks_vs_keras_D": 0.080078125,
+      "ks_vs_keras_p": 0.07119184161018922,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_embedding.0.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_embedding.2.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        32
+      ],
+      "torch_std": 0.1760895848274231,
+      "tf_std": 0.1747438758611679,
+      "keras_std": 0.17580825090408325,
+      "limit": 0.30618621784789724,
+      "expected_std": 0.17677669529663687,
+      "torch_max_abs": 0.30616724491119385,
+      "tf_max_abs": 0.30602648854255676,
+      "ks_vs_tf_D": 0.0135498046875,
+      "ks_vs_tf_p": 0.8898636268511075,
+      "ks_vs_keras_D": 0.00994873046875,
+      "ks_vs_keras_p": 0.3904397153517886,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "link_embedding.2.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_embedding.0.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        32
+      ],
+      "torch_std": 0.1765061616897583,
+      "tf_std": 0.17560319602489471,
+      "keras_std": 0.17650148272514343,
+      "limit": 0.30618621784789724,
+      "expected_std": 0.17677669529663687,
+      "torch_max_abs": 0.30617955327033997,
+      "tf_max_abs": 0.3061562478542328,
+      "ks_vs_tf_D": 0.02362060546875,
+      "ks_vs_tf_p": 0.2586979091517513,
+      "ks_vs_keras_D": 0.01312255859375,
+      "ks_vs_keras_p": 0.11812980857241488,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_embedding.0.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_embedding.2.weight",
+      "kind": "glorot",
+      "shape": [
+        32,
+        32
+      ],
+      "torch_std": 0.17644454538822174,
+      "tf_std": 0.17930470407009125,
+      "keras_std": 0.17609895765781403,
+      "limit": 0.30618621784789724,
+      "expected_std": 0.17677669529663687,
+      "torch_max_abs": 0.30618003010749817,
+      "tf_max_abs": 0.3060636520385742,
+      "ks_vs_tf_D": 0.01617431640625,
+      "ks_vs_tf_p": 0.7243651271357768,
+      "ks_vs_keras_D": 0.0126953125,
+      "ks_vs_keras_p": 0.14157712620984297,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "node_embedding.2.bias",
+      "kind": "zero",
+      "shape": [
+        32
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.0.weight",
+      "kind": "glorot",
+      "shape": [
+        16,
+        32
+      ],
+      "torch_std": 0.2018287479877472,
+      "tf_std": 0.2000814527273178,
+      "keras_std": 0.20397283136844635,
+      "limit": 0.3535533905932738,
+      "expected_std": 0.20412414523193154,
+      "torch_max_abs": 0.3535289466381073,
+      "tf_max_abs": 0.3534233272075653,
+      "ks_vs_tf_D": 0.020263671875,
+      "ks_vs_tf_p": 0.8454181588228955,
+      "ks_vs_keras_D": 0.021240234375,
+      "ks_vs_keras_p": 0.04896059941557725,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.0.bias",
+      "kind": "zero",
+      "shape": [
+        16
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.2.weight",
+      "kind": "glorot",
+      "shape": [
+        16,
+        16
+      ],
+      "torch_std": 0.25128331780433655,
+      "tf_std": 0.2547934055328369,
+      "keras_std": 0.25101596117019653,
+      "limit": 0.4330127018922193,
+      "expected_std": 0.25,
+      "torch_max_abs": 0.4329591691493988,
+      "tf_max_abs": 0.4324127733707428,
+      "ks_vs_tf_D": 0.039794921875,
+      "ks_vs_tf_p": 0.459354934424379,
+      "ks_vs_keras_D": 0.03271484375,
+      "ks_vs_keras_p": 0.02437017468941795,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.2.bias",
+      "kind": "zero",
+      "shape": [
+        16
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.4.weight",
+      "kind": "glorot",
+      "shape": [
+        5,
+        16
+      ],
+      "torch_std": 0.3051815330982208,
+      "tf_std": 0.327274352312088,
+      "keras_std": 0.3112737238407135,
+      "limit": 0.5345224838248488,
+      "expected_std": 0.3086066999241838,
+      "torch_max_abs": 0.5343302488327026,
+      "tf_max_abs": 0.5332202911376953,
+      "ks_vs_tf_D": 0.06484375,
+      "ks_vs_tf_p": 0.5742058357118475,
+      "ks_vs_keras_D": 0.03046874999999999,
+      "ks_vs_keras_p": 0.5859743067718594,
+      "checks": {
+        "bound": true,
+        "std": true,
+        "ks": true
+      },
+      "passed": true
+    },
+    {
+      "tensor": "readout_path.4.bias",
+      "kind": "zero",
+      "shape": [
+        5
+      ],
+      "torch_max_abs": 0.0,
+      "tf_max_abs": 0.0,
+      "checks": {
+        "zero": true
+      },
+      "passed": true
+    }
+  ]
+}

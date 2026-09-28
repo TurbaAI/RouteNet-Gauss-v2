@@ -25,6 +25,7 @@ Conda env **`RG_torch`** (`requirements-torch.txt`; torch must come from the `cu
 - Gradients of this model at untrained weights are numerically ill-conditioned (float64 magnitudes 1e8–1e24; float32 is off by orders of magnitude in TF and torch alike). Compare training runs by loss trajectories and test metrics, never by weight equality — see PYTORCH_PORT.md §6.
 - Keras semantics that the loop reproduces on purpose: per-tensor `clipnorm`, Adam ε placement (`training_lib.KerasAdam`), loss means weighted by predictions per scenario, callback order. Do not "simplify" these to torch idioms without re-running `parity/`.
 - `experiment_name="paper_weights"` writes into the shipped paper checkpoints; use any other name (`train.py` defaults to `torch_train`).
+- **Init defaults to `keras`** (the TF original's initialisers, drawn by PyTorch's RNG; `parity/check_keras_init.py`). PyTorch's own init (`--init torch`) leaves the delay val≈86.7 plateau ~14 epochs later and nearly got a `--patience 15` run early-stopped on it (PYTORCH_PORT.md §5.4) — keep `keras` as the default.
 
 ## Data & weights layout
 

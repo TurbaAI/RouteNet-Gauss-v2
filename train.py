@@ -71,7 +71,7 @@ RELOAD_WEIGHTS = False
 # PyTorch-only settings
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 THREADS = 1  # torch CPU threads (oversubscription with other jobs is very slow)
-INIT = "torch"  # "torch" (PyTorch default init) or "keras" (glorot/orthogonal/zeros, as TF)
+INIT = "keras"  # "keras" (glorot/orthogonal/zeros, as TF) or "torch" (PyTorch default init, PYTORCH_PORT.md §5.4)
 torch.set_num_threads(THREADS)
 torch.use_deterministic_algorithms(True)
 torch.backends.cudnn.allow_tf32 = False
@@ -228,9 +228,9 @@ early_stop = KerasEarlyStopping(
 #TF: reduce_lr_callback = tf.keras.callbacks.ReduceLROnPlateau(
 #TF:     factor=0.5, patience=10, verbose=1, cooldown=3, mode="min", monitor="loss"
 #TF: )
-reduce_lr_callback = KerasReduceLROnPlateau(
-    factor=0.5, patience=10, verbose=1, cooldown=3, mode="min", monitor="loss"
-) if False else KerasReduceLROnPlateau(factor=0.5, patience=10, verbose=1, cooldown=3, monitor="loss")
+reduce_lr_callback = KerasReduceLROnPlateau(  # mode="min" is the only mode it implements
+    factor=0.5, patience=10, verbose=1, cooldown=3, monitor="loss"
+)
 
 #TF: model.fit(
 #TF:     ds_train,
@@ -246,7 +246,8 @@ reduce_lr_callback = KerasReduceLROnPlateau(
 #TF:     use_multiprocessing=True,
 #TF: )
 # PyTorch: the same fit — same epochs/steps, same callbacks (early_stop is defined above but,
-# as in the TF script, NOT passed to fit; TerminateOnNaN is built into training_lib.fit). The
+# as in the TF script, NOT passed to fit; TerminateOnNaN is built into training_lib.fit), plus
+# logging the TF script did not write (history.csv, learning rate, step_losses.csv). The
 # training order is materialised up front (see experiment.py) and the run can be resumed
 # with the resume.pt written after every epoch.
 EPOCHS, STEPS_PER_EPOCH = 300, 500

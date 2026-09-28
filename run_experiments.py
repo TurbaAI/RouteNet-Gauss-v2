@@ -34,7 +34,8 @@ limitations under the License.
 # --nondeterministic, --resume, --wandb-project. CPU concurrency defaults to the core count.
 #   python run_experiments.py --experiment-name torch_baseline --epochs 5 --steps 50 --device cpu \
 #       --init keras --replay-from-root tensorflow_version_gt/replay
-#   python run_experiments.py --experiment-name torch_baseline_torchinit --epochs 5 --steps 50 --device cpu
+#   python run_experiments.py --experiment-name torch_baseline_torchinit --epochs 5 --steps 50 --device cpu \
+#       --init torch
 
 import argparse
 import csv
@@ -204,7 +205,8 @@ def parse_args():
     p.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto", help="auto: cuda if available")
     p.add_argument("--threads-per-job", type=int, default=None,
                    help="torch CPU threads per job (default: cores // concurrency, at least 1)")
-    p.add_argument("--init", choices=["torch", "keras"], default="torch")
+    p.add_argument("--init", choices=["torch", "keras"], default="keras",
+                   help="keras (default) = the TF original's initialisers; torch = PyTorch's defaults")
     p.add_argument("--replay-from-root", default=None,
                    help="tensorflow_version_gt/replay: every cell trains from the recorded TF init weights, "
                         "scenario order and z-scores (exact replay); implies --init keras")

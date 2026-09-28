@@ -41,9 +41,10 @@ def init_keras_style_(module: nn.Module) -> None:
     with: glorot-uniform kernels (Dense and GRU input kernels), orthogonal GRU recurrent
     kernels, zero biases. PyTorch's own defaults differ (kaiming-uniform Linear weights with
     uniform biases; uniform(-1/sqrt(H), 1/sqrt(H)) for every GRU tensor), so this is what
-    `RouteNetGauss(init="keras")` uses for the TF-comparison runs. Note that the *numbers*
-    still come from PyTorch's RNG — identical initial weights to a TF run are obtained by
-    loading them (see tf_reference/replay_tf_run.py and convert_tf_checkpoint.py)."""
+    `RouteNetGauss(init="keras")` — the default — uses; its distributions are checked against
+    the TF initialisers by parity/check_keras_init.py. Note that the *numbers* still come from
+    PyTorch's RNG — identical initial weights to a TF run are obtained by loading them (see
+    tf_reference/replay_tf_run.py and convert_tf_checkpoint.py)."""
     for m in module.modules():
         if isinstance(m, nn.Linear):
             nn.init.xavier_uniform_(m.weight)  # glorot_uniform: fan_in=in, fan_out=out, same as Keras
@@ -79,7 +80,7 @@ class RouteNetGauss(nn.Module):
         output_dim: int = 1,
         inference_mode: bool = False,
         use_trans_delay: bool = False,
-        init: str = "torch",
+        init: str = "keras",
     ):
         """RouteNet-Gauss model
 
@@ -113,10 +114,11 @@ class RouteNetGauss(nn.Module):
             Useful when aiming to predict the delay, as it allows the model to focus
             only on the queueing delay. By default False
         init : str, optional
-            PyTorch-only. "torch" (default) keeps PyTorch's default parameter
-            initialisation; "keras" re-initialises with the Keras defaults the TF model
-            used (glorot-uniform kernels, orthogonal recurrent kernels, zero biases), which
-            is what the TF-comparison experiments pass explicitly.
+            PyTorch-only. "keras" (default) initialises with the Keras defaults the TF model
+            used (glorot-uniform kernels, orthogonal recurrent kernels, zero biases); "torch"
+            keeps PyTorch's default parameter initialisation, which leaves the initial
+            val-loss plateau much later and can get a run early-stopped on it
+            (PYTORCH_PORT.md §5.4).
 
         Inputs (PyTorch): `forward` takes the same dict of per-scenario tensors as the TF
         `call`, with tf.RaggedTensor fields (`path_to_link`, `link_to_path`,
