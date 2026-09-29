@@ -350,3 +350,27 @@ trex_multiburst_filtered delay) compared field by field with the committed repor
   88.655, 88.653: still on the plateau, as expected after 10 steps) and checkpointed, exit 0.
 - `python -m visualization.describe_dataset --dataset mawi_pcaps --partition test --samples 0`:
   **passed** (exit 0).
+- L0 re-run (`results/verification/run_l0_recheck.sh`): **identical** — every summary field and every
+  per-scenario row of the three reports equals the committed one (e.g. converged trex delay: max
+  |TF − torch| 8.527e-9, MAPE 5.036778 vs 5.036774; paper mawi delay over 172 scenarios: 2.095e-9,
+  18.397431 vs 18.397430). The environment reproduces the §1 evidence exactly.
+
+### 7.6 TF-drawn versus PyTorch-drawn initial weights — rule fixed 2026-09-29, before the runs
+
+Why: the §7.4 runs and a 2×2 cross-over on seed 1 (TF-drawn or PyTorch-drawn initial weights ×
+TF's or PyTorch's scenario order, 25 epochs, `results/verification/run_diag_order_swap.sh`) showed
+that the plateau exit is set mainly by the initial weights — TF-drawn: epoch 2–7 with either order;
+PyTorch-drawn: epoch 13 with TF's order and 20 with PyTorch's — although their per-tensor
+distributions match (§7.1) and every initialisation has the same loss at step 0 (on the plateau
+the prediction is the transmission delay alone). With only two distinct TF draws, chance cannot be
+told from a systematic difference.
+
+Runs: 6 new TF-drawn initial weight sets — TF's own model code at `2e30d5d` in the TF environment,
+seeds 3–8, drawn through the ground-truth pipeline (the generator must reproduce the recorded seed-1
+and seed-2 initial weights bit for bit) — and 6 new PyTorch-drawn sets (`init=keras`, seeds 4–9).
+All 12 are trained in the same PyTorch pipeline on the same scenario order and z-scores (PyTorch
+seed 1), without early stopping, each until it leaves the plateau (at most 25 epochs; a run still
+on the plateau at epoch 24 counts as 25).
+
+- **Real difference** if the PyTorch-drawn exits are later with a one-sided Mann–Whitney U test
+  p < 0.05 **and** a median gap of at least 5 epochs; **otherwise no evidence of a difference**.
