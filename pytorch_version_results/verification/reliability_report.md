@@ -32,3 +32,27 @@ Seed 1: TF ground truth and the §7.3 run; seeds 2 and 3: first 25 epochs of the
 
 Rule (fixed before the runs): no PyTorch run early-stopped on the plateau, and none leaves it more than 5 epochs after the latest TF seed. **Verdict: Fail.**
 
+## 7.6 TF-drawn versus PyTorch-drawn initial weights
+
+| group | seed | plateau exit | epochs | status |
+|---|--:|--:|--:|---|
+| PyTorch-drawn | 4 | 10 | 11 | done |
+| PyTorch-drawn | 5 | — (none) | 25 | done |
+| PyTorch-drawn | 6 | 16 | 17 | done |
+| PyTorch-drawn | 7 | 11 | 12 | done |
+| PyTorch-drawn | 8 | 12 | 13 | done |
+| PyTorch-drawn | 9 | — (none) | 7 | failed |
+| TF-drawn | 3 | 11 | 12 | done |
+| TF-drawn | 4 | 14 | 15 | done |
+| TF-drawn | 5 | — (none) | 25 | done |
+| TF-drawn | 6 | 6 | 7 | done |
+| TF-drawn | 7 | 20 | 21 | done |
+| TF-drawn | 8 | 10 | 11 | done |
+
+| treatment | TF-drawn exits | PyTorch-drawn exits | median gap | one-sided Mann–Whitney p | verdict |
+|---|---|---|--:|--:|---|
+| failed runs excluded | [6, 10, 11, 14, 20, 25] | [10, 11, 12, 16, 25] | -0.5 | 0.403 | **no evidence of a difference** |
+| failed runs counted as 25 | [6, 10, 11, 14, 20, 25] | [10, 11, 12, 16, 25, 25] | +1.5 | 0.273 | **no evidence of a difference** |
+
+Rule (fixed before the runs): a real difference if the PyTorch-drawn exits are later with one-sided Mann–Whitney p < 0.05 and a median gap of at least 5 epochs; otherwise no evidence of a difference. Exits ≥ 25 are counted as 25.
+

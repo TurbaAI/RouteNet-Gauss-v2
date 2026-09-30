@@ -31,9 +31,12 @@ limitations under the License.
 
 import argparse
 import csv
+import itertools
 import json
 import os
 import sys
+
+import numpy as np
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _REPO_ROOT not in sys.path:
@@ -55,6 +58,7 @@ LIVE = {
     "torch_plateau_probe": "results/torch_plateau_probe",
 }
 FROZEN = "pytorch_version_results/verification"
+INIT_DRAWS_LIVE = "results/verification/init_draws"
 EXIT_BELOW = 75.0       # plateau exit = first epoch with val_loss below this (plateau ~86.7)
 BUDGET = 45             # the GT's epoch count, for "best val within TF's budget"
 PROBE_EPOCHS = 25
@@ -103,6 +107,25 @@ def run(root, seed, clamp):
         "n_negative_predictions": m.get("n_negative_predictions") if m else None,
         "init": m.get("init") if m else None,
     }
+
+
+def mann_whitney_greater(x, y):
+    """Exact one-sided Mann–Whitney U test that x tends to be larger than y: the permutation
+    p-value of the rank sum of x over every split of the pooled values (mid-ranks for ties)."""
+    pooled = list(x) + list(y)
+    order = sorted(range(len(pooled)), key=lambda i: pooled[i])
+    ranks = [0.0] * len(pooled)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and pooled[order[j + 1]] == pooled[order[i]]:
+            j += 1
+        for k in range(i, j + 1):
+            ranks[order[k]] = (i + j) / 2 + 1
+        i = j + 1
+    observed = sum(ranks[: len(x)])
+    splits = list(itertools.combinations(range(len(pooled)), len(x)))
+    return sum(1 for c in splits if sum(ranks[k] for k in c) >= observed - 1e-9) / len(splits)
 
 
 def stopped_on_plateau(r, horizon):
@@ -234,6 +257,41 @@ def main():
             "Reference: PyTorch's own init left the plateau at epoch 20 (§5, PYTORCH_PORT.md §5.4).", "",
             f"Rule (fixed before the runs): no PyTorch run early-stopped on the plateau, and none leaves it more than 5 epochs "
             f"after the latest TF seed. **Verdict: {v74}.**", ""]
+
+    # §7.6 TF-drawn vs PyTorch-drawn initial weights (one fixed order, no early stopping).
+    state_p = os.path.join(INIT_DRAWS_LIVE if a.live else os.path.join(FROZEN, "init_draws"), "state.json")
+    draws = json.load(open(state_p)) if os.path.exists(state_p) else {}
+    out += ["## 7.6 TF-drawn versus PyTorch-drawn initial weights", "",
+            "| group | seed | plateau exit | epochs | status |", "|---|--:|--:|--:|---|"]
+    for jid, d in sorted(draws.items(), key=lambda kv: (kv[1]["group"], kv[1]["seed"])):
+        out.append(f"| {d['group']} | {d['seed']} | {d['exit'] if d['exit'] is not None else '— (none)'} | "
+                   f"{d['epochs']} | {d['status']} |")
+    complete = len(draws) == 12 and all(d["status"] in ("done", "failed") for d in draws.values())
+    if complete:
+        def value(d):  # a run still on the plateau at epoch 24 counts as 25 (rule)
+            return d["exit"] if d["exit"] is not None else PROBE_EPOCHS
+        tf_v = [value(d) for d in draws.values() if d["group"] == "TF-drawn" and d["status"] == "done"]
+        failed = [d for d in draws.values() if d["status"] == "failed"]
+        pt_done = [value(d) for d in draws.values() if d["group"] == "PyTorch-drawn" and d["status"] == "done"]
+        variants = {"failed runs excluded": (tf_v, pt_done)}
+        if failed:  # the rule predates the NaN case: also count a failed run as never leaving the plateau (25)
+            variants["failed runs counted as 25"] = (
+                tf_v + [PROBE_EPOCHS for d in failed if d["group"] == "TF-drawn"],
+                pt_done + [PROBE_EPOCHS for d in failed if d["group"] == "PyTorch-drawn"])
+        res["init_draws"] = {"draws": draws, "variants": {}}
+        out += ["", "| treatment | TF-drawn exits | PyTorch-drawn exits | median gap | one-sided Mann–Whitney p | verdict |",
+                "|---|---|---|--:|--:|---|"]
+        for name, (tv, pv) in variants.items():
+            p_mw = mann_whitney_greater(pv, tv)
+            gap = float(np.median(pv) - np.median(tv))
+            verdict = "real difference" if (p_mw < 0.05 and gap >= 5) else "no evidence of a difference"
+            res["init_draws"]["variants"][name] = {"tf": tv, "pytorch": pv, "median_gap": gap, "p": p_mw, "verdict": verdict}
+            out.append(f"| {name} | {sorted(tv)} | {sorted(pv)} | {gap:+.1f} | {p_mw:.3f} | **{verdict}** |")
+        out += ["", "Rule (fixed before the runs): a real difference if the PyTorch-drawn exits are later with one-sided "
+                "Mann–Whitney p < 0.05 and a median gap of at least 5 epochs; otherwise no evidence of a difference. "
+                "Exits ≥ 25 are counted as 25.", ""]
+    else:
+        out += ["", "**Verdict: pending** (the 12 runs have not all finished).", ""]
 
     text = "\n".join(out)
     print(text)

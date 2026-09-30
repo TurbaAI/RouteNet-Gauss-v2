@@ -1,0 +1,52 @@
+resume.pt epoch: 6 | optimizer iterations: 3500
+/home/ubuntu/code/RouteNet-Gauss-v2/results/verification/diag_nan_replay.py:58: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:822.)
+  if not math.isfinite(float(loss)):
+step 281 (global 3781, sample 2673): loss 100.447 finite, NON-FINITE GRADIENT in ['flow_update.weight_ih_l0', 'flow_update.weight_hh_l0', 'flow_update.bias_ih_l0', 'flow_update.bias_hh_l0', 'link_update.weight_ih', 'link_update.weight_hh', 'link_update.bias_ih', 'link_update.bias_hh', 'queue_update.weight_ih', 'queue_update.weight_hh', 'queue_update.bias_ih', 'queue_update.bias_hh', 'node_update.weight_ih', 'node_update.weight_hh', 'node_update.bias_ih', 'node_update.bias_hh', 'flow_embedding.0.weight', 'flow_embedding.0.bias', 'flow_embedding.2.weight', 'flow_embedding.2.bias', 'queue_embedding.0.weight', 'queue_embedding.0.bias', 'queue_embedding.2.weight', 'queue_embedding.2.bias', 'link_embedding.0.weight', 'link_embedding.0.bias', 'link_embedding.2.weight', 'link_embedding.2.bias', 'node_embedding.0.weight', 'node_embedding.0.bias', 'node_embedding.2.weight', 'node_embedding.2.bias']
+   flow_update.weight_ih_l0: 6144 non-finite of 6144; finite max |g| nan
+   flow_update.weight_hh_l0: 3072 non-finite of 3072; finite max |g| nan
+   flow_update.bias_ih_l0: 96 non-finite of 96; finite max |g| nan
+   flow_update.bias_hh_l0: 96 non-finite of 96; finite max |g| nan
+   link_update.weight_ih: 3072 non-finite of 3072; finite max |g| nan
+   link_update.weight_hh: 3072 non-finite of 3072; finite max |g| nan
+   link_update.bias_ih: 96 non-finite of 96; finite max |g| nan
+   link_update.bias_hh: 96 non-finite of 96; finite max |g| nan
+   queue_update.weight_ih: 6144 non-finite of 6144; finite max |g| nan
+   queue_update.weight_hh: 3072 non-finite of 3072; finite max |g| nan
+   queue_update.bias_ih: 96 non-finite of 96; finite max |g| nan
+   queue_update.bias_hh: 96 non-finite of 96; finite max |g| nan
+   node_update.weight_ih: 3072 non-finite of 3072; finite max |g| nan
+   node_update.weight_hh: 3072 non-finite of 3072; finite max |g| nan
+   node_update.bias_ih: 96 non-finite of 96; finite max |g| nan
+   node_update.bias_hh: 96 non-finite of 96; finite max |g| nan
+   flow_embedding.0.weight: 81 non-finite of 96; finite max |g| 1.867e+36
+   flow_embedding.0.bias: 27 non-finite of 32; finite max |g| 2.628e+36
+   flow_embedding.2.weight: 864 non-finite of 1024; finite max |g| 9.694e+35
+   flow_embedding.2.bias: 27 non-finite of 32; finite max |g| 2.281e+36
+   queue_embedding.0.weight: 69 non-finite of 96; finite max |g| 0.000e+00
+   queue_embedding.0.bias: 23 non-finite of 32; finite max |g| 0.000e+00
+   queue_embedding.2.weight: 800 non-finite of 1024; finite max |g| 0.000e+00
+   queue_embedding.2.bias: 25 non-finite of 32; finite max |g| 0.000e+00
+   link_embedding.0.weight: 20 non-finite of 32; finite max |g| 0.000e+00
+   link_embedding.0.bias: 20 non-finite of 32; finite max |g| 0.000e+00
+   link_embedding.2.weight: 352 non-finite of 1024; finite max |g| 0.000e+00
+   link_embedding.2.bias: 11 non-finite of 32; finite max |g| 0.000e+00
+   node_embedding.0.weight: 704 non-finite of 1024; finite max |g| 0.000e+00
+   node_embedding.0.bias: 22 non-finite of 32; finite max |g| 0.000e+00
+   node_embedding.2.weight: 672 non-finite of 1024; finite max |g| 0.000e+00
+   node_embedding.2.bias: 21 non-finite of 32; finite max |g| 0.000e+00
+   after the (clipped) update, non-finite weights in: ['flow_update.weight_ih_l0', 'flow_update.weight_hh_l0', 'flow_update.bias_ih_l0', 'flow_update.bias_hh_l0', 'link_update.weight_ih', 'link_update.weight_hh', 'link_update.bias_ih', 'link_update.bias_hh', 'queue_update.weight_ih', 'queue_update.weight_hh', 'queue_update.bias_ih', 'queue_update.bias_hh', 'node_update.weight_ih', 'node_update.weight_hh', 'node_update.bias_ih', 'node_update.bias_hh', 'flow_embedding.0.weight', 'flow_embedding.0.bias', 'flow_embedding.2.weight', 'flow_embedding.2.bias', 'queue_embedding.0.weight', 'queue_embedding.0.bias', 'queue_embedding.2.weight', 'queue_embedding.2.bias', 'link_embedding.0.weight', 'link_embedding.0.bias', 'link_embedding.2.weight', 'link_embedding.2.bias', 'node_embedding.0.weight', 'node_embedding.0.bias', 'node_embedding.2.weight', 'node_embedding.2.bias']
+largest |gradient| over the last steps before that (step, loss, tensor, max|g|):
+   270  loss   79.083  readout_path.4.weight        6.249e-02
+   271  loss   88.525  readout_path.4.weight        7.521e-02
+   272  loss   90.423  readout_path.4.weight        1.679e-01
+   273  loss   90.164  readout_path.4.weight        2.388e-01
+   274  loss   81.773  readout_path.4.weight        1.834e-01
+   275  loss   76.506  readout_path.4.weight        1.756e-01
+   276  loss   91.903  queue_update.weight_ih       6.838e+09
+   277  loss  105.656  queue_update.weight_ih       1.449e+17
+   278  loss  128.168  queue_update.weight_ih       4.707e+13
+   279  loss  109.334  queue_update.weight_ih       3.283e+13
+   280  loss  120.957  queue_update.weight_ih       2.704e+22
+   281  loss  100.447  flow_update.weight_ih_l0     nan
+overall largest |gradient| seen: (280, 120.95697021484375, 'queue_update.weight_ih', 2.7040711041041536e+22)

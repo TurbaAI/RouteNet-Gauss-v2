@@ -116,9 +116,7 @@ class RouteNetGauss(nn.Module):
         init : str, optional
             PyTorch-only. "keras" (default) initialises with the Keras defaults the TF model
             used (glorot-uniform kernels, orthogonal recurrent kernels, zero biases); "torch"
-            keeps PyTorch's default parameter initialisation, which leaves the initial
-            val-loss plateau much later and can get a run early-stopped on it
-            (PYTORCH_PORT.md §5.4).
+            keeps PyTorch's default parameter initialisation (PYTORCH_PORT.md §5.4).
 
         Inputs (PyTorch): `forward` takes the same dict of per-scenario tensors as the TF
         `call`, with tf.RaggedTensor fields (`path_to_link`, `link_to_path`,

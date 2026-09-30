@@ -48,6 +48,8 @@ done
 # L0 re-check reports and the scripts that produced everything above
 put results/verification/l0_recheck $F/l0_recheck l0_converged_trex_multiburst_delay_seed1.json \
     l0_paper_mawi_pcaps_delay.json l0_paper_trex_multiburst_filtered_delay.json
-put results/verification $F/scripts run_tf_envelope.sh run_tf_probes.sh run_torch_native.sh run_torch_probes.sh \
-    run_l0_recheck.sh run_diag_order_swap.sh run_init_draws.py diag_init_stats.py status.py freeze.sh
+refresh results/verification $F/scripts run_tf_envelope.sh run_tf_probes.sh run_torch_native.sh run_torch_probes.sh \
+    run_l0_recheck.sh run_diag_order_swap.sh run_init_draws.py diag_init_stats.py diag_nan_replay.py \
+    diag_nan_fp64.py status.py freeze.sh
+put results/verification/logs $F/diagnosis diag_nan_replay.log diag_nan_fp64.log
 du -sh $F

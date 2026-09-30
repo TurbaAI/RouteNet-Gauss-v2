@@ -223,7 +223,7 @@ and the torch-init runs — which use no TensorFlow input at all — are the clo
 
 ![Converged learning curves](pytorch_version_results/figures/fig1_converged_curves.png)
 
-*fig 1 — validation loss per epoch. The torch-init delay run (green) is flat at ≈87 until epoch 21:
+*fig 1 — validation loss per epoch. The torch-init delay run (green) is flat at ≈87 until epoch 20 (0-based):
 the initialisation plateau (PYTORCH_PORT.md §5.4).*
 
 ![Converged test accuracy per percentile](pytorch_version_results/figures/fig2_converged_metrics.png)
@@ -290,6 +290,14 @@ After §5, three things were still argued rather than measured:
    on the last epoch before early stopping would have ended it (PYTORCH_PORT.md §5.4), so the
    default init is now `keras`;
 3. whether that new default — no training run had used it before — trains like TF.
+
+**Outcome (2026-09-30).** §7.2 confirmed (TF's own converged endpoint moves 1.37 MAPE points when only
+its thread count changes — the §5 differences are TF-sized); §7.3 passed (the default pipeline, with
+no TF input, lands 0.08 MAPE points from TF); §7.4 **failed** its rule (one PyTorch seed left the
+plateau 9 epochs after the latest TF seed) and was diagnosed (§7.4a) and followed up with twelve more
+draws (§7.6): no evidence that PyTorch-drawn weights leave the plateau later than TF-drawn ones. The
+premise of point 2 above turned out to be wrong: the init *scheme* does not decide the plateau
+length, the particular draw does, in TF as well.
 
 The rules below were written down and committed before any of the runs produced a result. Epochs
 are 0-based, as in `history.csv`; TF test metrics use clamped predictions (§1). Scripts, logs and a
@@ -437,3 +445,28 @@ on the plateau at epoch 24 counts as 25).
 
 - **Real difference** if the PyTorch-drawn exits are later with a one-sided Mann–Whitney U test
   p < 0.05 **and** a median gap of at least 5 epochs; **otherwise no evidence of a difference**.
+
+**Result — no evidence of a difference.** All 12 runs finished; one PyTorch-drawn run (seed 9) was
+stopped by `TerminateOnNaN` at epoch 7, still on the plateau (explained below). The rule predates that
+case, so it is applied both ways:
+
+| treatment of the NaN run | TF-drawn exits | PyTorch-drawn exits | median gap | one-sided Mann–Whitney p | verdict |
+|---|---|---|--:|--:|---|
+| excluded | 6, 10, 11, 14, 20, ≥25 | 10, 11, 12, 16, ≥25 | −0.5 | 0.40 | no evidence of a difference |
+| counted as never leaving (25) | 6, 10, 11, 14, 20, ≥25 | 10, 11, 12, 16, ≥25, ≥25 | +1.5 | 0.27 | no evidence of a difference |
+
+How long delay training sits on the plateau is a heavy-tailed property of the particular initial
+weights **in both frameworks**: TF's own draws leave it anywhere from epoch 6 to beyond 25, and TF-drawn
+seed 5 never left it within 25 epochs. The §7.4 failure was a three-draw sample of that spread
+(pooled with §7.4 and the cross-over: TF-drawn 2–≥25, PyTorch-drawn 7–≥25). One consequence holds for
+the TF original as much as for the port: with the converged configuration's early stopping (patience
+15, counted from epoch 4), a plateau lasting past epoch ~19 ends the run with the untrained model.
+
+**The NaN run.** Replaying seed 9 from its `resume.pt` reproduces the failure bit for bit
+(`pytorch_version_results/verification/scripts/diag_nan_replay.py`): on the plateau the recurrent gradients explode within five steps
+(largest element 6.8e9 → 1.4e17 → 2.7e22) and then overflow float32; the per-tensor clipping
+(`g·c / max(‖g‖, c)`, TF's `tf.clip_by_norm` formula) turns the inf into NaN weights. The float64
+reference gradient at that step is **4.1e40**, beyond float32's range (3.4e38)
+(`pytorch_version_results/verification/scripts/diag_nan_fp64.py`, logs in `pytorch_version_results/verification/diagnosis/`), so any float32 implementation — TF included —
+overflows there. It is the ill-conditioning of §6 / PYTORCH_PORT.md §6, and the reason the TF
+pipeline carries `TerminateOnNaN`; not a port defect.

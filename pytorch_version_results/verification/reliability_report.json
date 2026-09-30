@@ -68,5 +68,172 @@
     "pytorch_stopped_on_plateau": [],
     "tf_stopped_on_plateau": [],
     "verdict": "Fail"
+  },
+  "init_draws": {
+    "draws": {
+      "pt_s4": {
+        "group": "PyTorch-drawn",
+        "seed": 4,
+        "status": "done",
+        "exit": 10,
+        "epochs": 11,
+        "exit_val": 23.061748131964364,
+        "last_val": 23.061748131964364,
+        "hours": 7.37
+      },
+      "tf_s3": {
+        "group": "TF-drawn",
+        "seed": 3,
+        "status": "done",
+        "exit": 11,
+        "epochs": 12,
+        "exit_val": 52.413221600442625,
+        "last_val": 52.413221600442625,
+        "hours": 7.86
+      },
+      "tf_s4": {
+        "group": "TF-drawn",
+        "seed": 4,
+        "status": "done",
+        "exit": 14,
+        "epochs": 15,
+        "exit_val": 20.72868762295155,
+        "last_val": 20.72868762295155,
+        "hours": 8.15
+      },
+      "pt_s5": {
+        "group": "PyTorch-drawn",
+        "seed": 5,
+        "status": "done",
+        "exit": null,
+        "epochs": 25,
+        "exit_val": null,
+        "last_val": 86.70432395322621,
+        "hours": 0.51
+      },
+      "tf_s6": {
+        "group": "TF-drawn",
+        "seed": 6,
+        "status": "done",
+        "exit": 6,
+        "epochs": 7,
+        "exit_val": 42.350664131652465,
+        "last_val": 42.350664131652465,
+        "hours": 3.48
+      },
+      "pt_s7": {
+        "group": "PyTorch-drawn",
+        "seed": 7,
+        "status": "done",
+        "exit": 11,
+        "epochs": 12,
+        "exit_val": 47.552320492917296,
+        "last_val": 47.552320492917296,
+        "hours": 6.3
+      },
+      "tf_s5": {
+        "group": "TF-drawn",
+        "seed": 5,
+        "status": "done",
+        "exit": null,
+        "epochs": 25,
+        "exit_val": null,
+        "last_val": 86.69670542096493,
+        "hours": 7.77
+      },
+      "pt_s6": {
+        "group": "PyTorch-drawn",
+        "seed": 6,
+        "status": "done",
+        "exit": 16,
+        "epochs": 17,
+        "exit_val": 26.490735183035277,
+        "last_val": 26.490735183035277,
+        "hours": 8.73
+      },
+      "pt_s9": {
+        "group": "PyTorch-drawn",
+        "seed": 9,
+        "status": "failed",
+        "exit": null,
+        "epochs": 7,
+        "exit_val": null,
+        "last_val": 86.67191088160493,
+        "hours": 3.64
+      },
+      "tf_s8": {
+        "group": "TF-drawn",
+        "seed": 8,
+        "status": "done",
+        "exit": 10,
+        "epochs": 11,
+        "exit_val": 54.7597167005045,
+        "last_val": 54.7597167005045,
+        "hours": 5.29
+      },
+      "pt_s8": {
+        "group": "PyTorch-drawn",
+        "seed": 8,
+        "status": "done",
+        "exit": 12,
+        "epochs": 13,
+        "exit_val": 30.73935813128153,
+        "last_val": 30.73935813128153,
+        "hours": 6.26
+      },
+      "tf_s7": {
+        "group": "TF-drawn",
+        "seed": 7,
+        "status": "done",
+        "exit": 20,
+        "epochs": 21,
+        "exit_val": 44.84833369622405,
+        "last_val": 44.84833369622405,
+        "hours": 10.08
+      }
+    },
+    "variants": {
+      "failed runs excluded": {
+        "tf": [
+          11,
+          14,
+          6,
+          25,
+          10,
+          20
+        ],
+        "pytorch": [
+          10,
+          25,
+          11,
+          16,
+          12
+        ],
+        "median_gap": -0.5,
+        "p": 0.4025974025974026,
+        "verdict": "no evidence of a difference"
+      },
+      "failed runs counted as 25": {
+        "tf": [
+          11,
+          14,
+          6,
+          25,
+          10,
+          20
+        ],
+        "pytorch": [
+          10,
+          25,
+          11,
+          16,
+          12,
+          25
+        ],
+        "median_gap": 1.5,
+        "p": 0.2727272727272727,
+        "verdict": "no evidence of a difference"
+      }
+    }
   }
 }

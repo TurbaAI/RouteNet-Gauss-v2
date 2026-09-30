@@ -1,0 +1,8 @@
+step sample  loss f32  loss f64                    largest |grad| float32                    largest |grad| float64
+ 276    721    91.903    91.639        queue_update.weight_ih   6.838e+09        queue_update.weight_ih   5.858e+07
+ 277    706   105.656   105.625        queue_update.weight_ih   1.449e+17        queue_update.weight_ih   8.318e+13
+ 278    680   128.168   125.696        queue_update.weight_ih   4.707e+13        queue_update.weight_ih   3.999e+13
+ 279    256   109.334   108.924        queue_update.weight_ih   3.283e+13        queue_update.weight_ih   2.996e+12
+ 280    989   120.957   121.619        queue_update.weight_ih   2.704e+22        queue_update.weight_ih   3.750e+26
+ 281   2673   100.447   100.225      flow_update.weight_ih_l0         inf        queue_update.weight_ih   4.064e+40   <- float64 beyond float32 range
+weights non-finite after step 281

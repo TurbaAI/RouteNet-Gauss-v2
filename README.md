@@ -133,7 +133,9 @@ same weights, the two frameworks agree to ~1e-8 on every prediction of every che
 repository; training from TensorFlow's own initial weights and scenario order, the PyTorch loss
 curve stays inside the envelope TensorFlow shows against *itself*; and trained to convergence,
 three of the four PyTorch runs land inside the pre-registered accuracy gate against the ground
-truth, with the fourth outside it in the *favourable* direction.
+truth, with the fourth outside it in the *favourable* direction — by no more than TensorFlow moves
+when only its thread count changes (1.37 MAPE points, measured). With its defaults and no
+TensorFlow input at all, the PyTorch pipeline lands 0.08 MAPE points from the ground truth.
 
 What could not be reproduced — and was never reproducible in the first place — is bit-identical
 weights after training. This model's gradients are numerically ill-conditioned, and TensorFlow
@@ -152,6 +154,7 @@ assumed, and it sets the standard everything else is judged against (§0 of
 | 4 | **Native PyTorch pipeline**, 8 quick cells (torch init + torch shuffle) | **7/8 within gates**; the miss is `trex_multiburst`/jitter/seed 2, the cell whose objective defeats TF's own reproducibility |
 | 5 | **Converged accuracy**, 4 runs to early stopping | **3/4 inside the gate** (±1 MAPE point, ±0.03 R²); the 4th is outside it by being **better** than the ground truth (table below) |
 | 6 | **Evaluation notebook** (`evaluation_torch.ipynb`) | Runs clean and reproduces the paper's model-vs-simulator tables; its OMNeT++ column is **bit-identical** to TensorFlow's on all six dataset/metric combinations |
+| 7 | **Reliability verification** ([PYTORCH_PARITY.md §7](PYTORCH_PARITY.md), rules committed before the runs) | TF against itself at convergence (one thread): moves **1.37 MAPE points** — the delay replay's "better" result is TF-sized (**confirmed**). Default pipeline to convergence: **5.116** vs 5.037 MAPE (**pass**). Plateau test, 3 seeds: **failed** its rule; diagnosed — the initial-weights *draw* decides how long training sits on the starting plateau, in TF too; 12 further draws: **no difference** between TF- and PyTorch-drawn weights (p = 0.40). Forward parity re-run: identical |
 
 #### Converged accuracy — the headline result
 
@@ -164,6 +167,8 @@ ground truth was. TF metrics are recomputed from its stored predictions clamped 
 | delay | TensorFlow (ground truth) | 45 | 5.037 | — | 6.660 | 0.7402 | — | — |
 | delay | PyTorch, exact replay | 152 | **3.045** | −1.99 | **4.054** | **0.8465** | +0.106 | outside, **better** |
 | delay | PyTorch, torch init | 62 | 4.837 | −0.20 | 6.440 | 0.7397 | −0.0006 | ✅ pass |
+| delay | PyTorch, current defaults (§7.3) | 57 | 5.116 | +0.08 | 6.765 | 0.7412 | +0.0010 | ✅ pass |
+| delay | *TensorFlow, one intra-op thread (§7.2)* | 94 | *3.668* | −1.37 | *4.860* | *0.8148* | +0.075 | *TF vs itself* |
 | jitter | TensorFlow (ground truth) | 193 | 11.749 | — | 1.881 | 0.8871 | — | — |
 | jitter | PyTorch, exact replay | 92 | 12.575 | +0.83 | 1.955 | 0.8817 | −0.0054 | ✅ pass |
 | jitter | PyTorch, torch init | 114 | 12.270 | +0.52 | 1.982 | 0.8793 | −0.0079 | ✅ pass |
@@ -174,14 +179,18 @@ for the float32 reasons above. The delay replay happened to keep finding improve
 epochs against TensorFlow's 45, ending in a better basin. The like-for-like comparison — best
 validation loss *within TensorFlow's own epoch budget* — puts PyTorch marginally **behind**:
 
-| target | TF budget | TF best | PyTorch exact replay | PyTorch torch init |
-|---|--:|--:|--:|--:|
-| delay | 45 epochs | 7.066 | 7.653 (+0.59) | 7.850 (+0.78) |
-| jitter | 193 epochs | 11.635 | 12.134 (+0.50) | 12.176 (+0.54) |
+| target | TF budget | TF best | PyTorch exact replay | PyTorch torch init | PyTorch current defaults | TF, one thread |
+|---|--:|--:|--:|--:|--:|--:|
+| delay | 45 epochs | 7.066 | 7.653 (+0.59) | 7.850 (+0.78) | 7.097 (+0.03) | 7.005 (−0.06) |
+| jitter | 193 epochs | 11.635 | 12.134 (+0.50) | 12.176 (+0.54) | — | — |
 
-A 0.5–0.8 gap on validation loss is inside this model's run-to-run spread (TensorFlow's own two
-seeds of a quick cell differ by up to 2.8 MAPE points). The fair conclusion: **the port neither
-improved nor degraded learning; it reproduced it, and the endpoints differ by trajectory luck.**
+The endpoint claim is now measured rather than argued: re-run with nothing changed but its thread
+count, TensorFlow itself trained 94 epochs instead of 45 and ended at 3.67 MAPE — the same
+direction and size as the PyTorch replay's move (PYTORCH_PARITY.md §7.2). On the equal-budget
+measure the two TF runs agree closely (−0.06) while the PyTorch runs spread from +0.03 to +0.78,
+so that quantity is not a stable property of either framework. The fair conclusion: **the port
+neither improved nor degraded learning; it reproduced it, and the endpoints differ by trajectory
+luck.**
 
 ![Converged learning curves](pytorch_version_results/figures/fig1_converged_curves.png)
 
@@ -207,13 +216,17 @@ under a thread-count change (blue), and past step 200 on delay the latter is lar
 
 #### Caveats worth knowing
 
-1. **Initialisation decides when training leaves its starting plateau.** Delay training starts on
-   a val-loss ≈ 86.7 plateau. With the TF original's (Keras) initialisers it left at epoch 6 in TF
-   and epoch 2 in the PyTorch exact replay; with PyTorch's own default init only at epoch 20 —
-   the last epoch before early stopping (patience 15) would have ended the run with the untrained
-   plateau model (epochs 0-based). The default is therefore `--init keras` — the Keras
-   initialisers drawn by PyTorch's RNG, checked against TF's by `parity/check_keras_init.py` —
-   and `--init torch` remains available ([PYTORCH_PORT.md §5.4](PYTORCH_PORT.md)).
+1. **Delay training can sit on its starting plateau for a long time — in TF and PyTorch alike.**
+   It starts on a val-loss ≈ 86.7 plateau (the model predicts only the transmission delay), and
+   how long it stays depends on the particular initial-weights draw: TF's own draws leave anywhere
+   from epoch 2 to beyond 25 (0-based), and PyTorch's are statistically indistinguishable
+   (PYTORCH_PARITY.md §7.6). With the converged configuration's early stopping (patience 15,
+   counted from epoch 4), a plateau lasting past epoch ~19 ends the run with the untrained model,
+   so check that a run has left it. On the plateau the recurrent gradients can also overflow
+   float32 (a float64 gradient of 4e40 in one run); `TerminateOnNaN` stops such a run in both
+   frameworks. The default init is `--init keras`, the TF original's scheme drawn by PyTorch's
+   RNG (checked by `parity/check_keras_init.py`); `--init torch` remains available
+   ([PYTORCH_PORT.md §5.4](PYTORCH_PORT.md)).
 2. **A latent bug in the original TensorFlow evaluation.** `inference_mode=True` was set *after*
    training, which never reaches the `tf.function` traces cached during training, so 879 delay and
    50 jitter test predictions were never clamped at 0. The ground truth's stored delay MAPE is
@@ -242,6 +255,8 @@ python parity/l1_grad_step.py --checkpoint … # loss / gradients / one optimize
 python parity/check_notebook_eval.py         # the notebook's OMNeT++ column vs TF
 python compare_results.py --tf tensorflow_version_gt --torch results/<experiment>
 python parity/make_figures.py                # the figures above
+python parity/check_keras_init.py            # the default init's distributions vs TF's
+python parity/reliability_report.py          # §7 verdicts from pytorch_version_results/verification/
 ```
 
 Full numbers: [PYTORCH_PARITY.md](PYTORCH_PARITY.md) · translation notes and every semantic

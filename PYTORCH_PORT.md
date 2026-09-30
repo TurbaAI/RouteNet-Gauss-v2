@@ -128,9 +128,8 @@ torch_adam` is available to use `torch.optim.Adam(eps=1e-7)` instead.
 Keras: glorot-uniform kernels, orthogonal recurrent kernels, zero biases. PyTorch: kaiming-uniform
 Linear weights with uniform biases; uniform(±1/√H) for all GRU tensors. The default is `--init
 keras` — the TF original's scheme, drawn by PyTorch's RNG — in `models.py`, `experiment.py`,
-`run_experiments.py` and `train.py` since 2026-09-28 (it was `torch` before; the measurement below
-is why it changed). `--init torch` selects PyTorch's scheme. Every run records its init in
-`metrics.json`.
+`run_experiments.py` and `train.py` since 2026-09-28 (it was `torch` before). `--init torch` selects
+PyTorch's scheme. Every run records its init in `metrics.json`.
 
 **The Keras scheme is checked, not assumed** (`parity/check_keras_init.py`, report
 `pytorch_version_results/parity/keras_init_check.md`). No training run had used it before it became
@@ -142,25 +141,29 @@ themselves: every tensor is re-initialised, biases are exactly 0, glorot kernels
 6e-7 (the recorded TF ones to 5e-7, which also validates the converter's GRU layout), and the
 two-sample Kolmogorov–Smirnov p-values against both references are all ≥ 0.024.
 
-**Measured consequence (trex_multiburst / delay / seed 1, 500 steps per epoch; epochs 0-based as in
-`history.csv`).** Training starts on a plateau at val_loss ≈ 86.7 that the model has to escape
-before it learns anything. The initialisation decides *when* that happens:
+**The initial plateau — the draw decides, not the scheme** (trex_multiburst / delay, 500 steps
+per epoch; epochs 0-based as in `history.csv`; details in PYTORCH_PARITY.md §7.4a and §7.6).
+Training starts on a plateau at val_loss ≈ 86.7: the readout's occupancy output is O(1) while link
+capacities are ~1e9–1e10 bit/s, so the queueing term is negligible and the model predicts the
+transmission delay alone, whatever its weights. How long it takes to leave depends on the particular
+initial weights (and, by a few epochs, on the scenario order):
 
-| init | run | plateau exit | val_loss over the next epochs | best val_loss |
-|---|---|--:|---|--:|
-| Keras (TF's recorded weights) | TF ground truth | epoch **6** | 49.6 → 21.5 → 15.6 → 12.7 | 7.07 (epoch 29) |
-| Keras (TF's recorded weights) | PyTorch exact replay | epoch **2** | 42.1 → 24.2 → 18.8 → 25.2 | 4.98 (epoch 136) |
-| PyTorch default | PyTorch, torch init | epoch **20** | 56.4 → 21.7 → 22.2 → 18.5 | 6.61 (epoch 46) |
+| initial weights | plateau exits observed (epoch) |
+|---|---|
+| drawn by TF (Keras scheme) | 2, 4, 5, 6, 6, 7, 10, 11, 11, 14, 20, ≥ 25 |
+| drawn by PyTorch, Keras scheme | 7, 10, 11, 12, 13, 13, 16, 20, ≥ 25 |
+| drawn by PyTorch, PyTorch scheme | 20 (same seed and order as a Keras-scheme run that also left at 20) |
 
-The torch-init run escaped on the last epoch it had. Early stopping (patience 15, counted from
-epoch 4) held its best value at epoch 5 (86.672) with 14 non-improving epochs behind it when epoch
-20 finally improved; one more flat epoch and the run would have stopped and restored the plateau
-model (val MAPE ≈ 87 %). On the way it also went through a transient divergence (train loss
-86 → 106 at epochs 6–8) that the Keras-initialised runs did not. The descent after the break is
-the same. Short runs cannot see any of this — the quick 5×50 set never leaves the plateau, and its
-native-init cells still match TF to within ±0.3 MAPE points. Runs without early stopping (e.g.
-`train.py`, 300 fixed epochs) only lose the ~14 plateau epochs; runs with it (the converged
-configuration, `--patience 15`) can end with an untrained model.
+Twelve fresh draws in one pipeline show no difference between TF-drawn and PyTorch-drawn weights
+(PYTORCH_PARITY.md §7.6: medians 12.5 and 12, one-sided Mann–Whitney p = 0.40). The 2026-08-31 and
+2026-09-28 reading of this section — "PyTorch's init scheme leaves the plateau ~14 epochs later" —
+was a one-seed coincidence and is retracted; the default stays `keras` because it is the TF
+original's scheme. With the converged configuration's early stopping (patience 15, counted from
+epoch 4), a plateau lasting past epoch ~19 ends the run with the untrained plateau model — the
+torch-init seed-1 run left at epoch 20 with its counter at 14 of 15 — and this applies to the TF
+original as much as to the port. Runs without early stopping (e.g. `train.py`, 300 fixed epochs)
+only lose the plateau epochs. On the plateau the recurrent gradients can also explode past float32's
+range (a float64 gradient of 4e40 in one §7.6 run), which `TerminateOnNaN` catches in both frameworks.
 
 ### 5.5 Shuffle order and z-scores
 See §3. In the TF pipeline the z-score step consumes the first shuffled pass and `model.fit` the
