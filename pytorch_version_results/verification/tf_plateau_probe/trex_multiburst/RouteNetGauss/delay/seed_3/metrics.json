@@ -1,0 +1,48 @@
+{
+  "dataset": "trex_multiburst",
+  "target": "delay",
+  "seed": 3,
+  "epochs": 25,
+  "epochs_run": 25,
+  "patience": 15,
+  "steps_per_epoch": 500,
+  "backend": "cpu",
+  "train_seconds": 63958.63,
+  "final_train_loss": 8.645119667053223,
+  "final_val_loss": 8.788793563842773,
+  "best_val_loss": 7.873470783233643,
+  "n_test_predictions": 175028,
+  "test_overall": {
+    "mape": 7.388453185558319,
+    "mae_us": 9.965882782125846,
+    "r2": 0.3424711791674986
+  },
+  "test_per_percentile": {
+    "avg": {
+      "mape": 7.487055659294128,
+      "mae_us": 9.459300599701237,
+      "r2": 0.3174952424462235
+    },
+    "p50": {
+      "mape": 7.712353020906448,
+      "mae_us": 9.62635203904938,
+      "r2": 0.31531420716872216
+    },
+    "p90": {
+      "mape": 6.979263573884964,
+      "mae_us": 9.6410340120201,
+      "r2": 0.297312063664981
+    },
+    "p95": {
+      "mape": 7.0877909660339355,
+      "mae_us": 9.983928975998424,
+      "r2": 0.2899897550982854
+    },
+    "p99": {
+      "mape": 7.67579972743988,
+      "mae_us": 11.118797374365386,
+      "r2": 0.2595370582118758
+    }
+  },
+  "experiment_path": "tf_plateau_probe/trex_multiburst/RouteNetGauss/delay/seed_3"
+}

@@ -1,0 +1,72 @@
+{
+  "live": false,
+  "setup_check_bit_identical": true,
+  "tf_envelope": {
+    "gt": {
+      "dir": "tensorflow_version_gt/converged/results/trex_multiburst/RouteNetGauss/delay/seed_1",
+      "epochs": 45,
+      "finished": true,
+      "exit": 6,
+      "best_within_budget": 7.066253662109375,
+      "best": 7.066253662109375,
+      "epochs_run": 45,
+      "test_mape": 5.036778002977371,
+      "test_r2": 0.7402434349060059,
+      "test_mape_stored": 5.074520781636238,
+      "n_negative_predictions": 879,
+      "init": null
+    },
+    "tf_1thread": {
+      "dir": "pytorch_version_results/verification/tf_envelope_1thread/trex_multiburst/RouteNetGauss/delay/seed_1",
+      "epochs": 94,
+      "finished": true,
+      "exit": 5,
+      "best_within_budget": 7.004851341247559,
+      "best": 5.590158462524414,
+      "epochs_run": 94,
+      "test_mape": 3.6678578704595566,
+      "test_r2": 0.8148061037063599,
+      "test_mape_stored": 3.6732684820890427,
+      "n_negative_predictions": 188,
+      "init": null
+    },
+    "delta_best_within_budget": -0.061402320861816406,
+    "delta_test_mape": -1.3689201325178146,
+    "verdict": "Confirmed"
+  },
+  "native": {
+    "run": {
+      "dir": "pytorch_version_results/verification/torch_converged_native/trex_multiburst/RouteNetGauss/delay/seed_1",
+      "epochs": 57,
+      "finished": true,
+      "exit": 20,
+      "best_within_budget": 7.097041375908748,
+      "best": 7.097041375908748,
+      "epochs_run": 57,
+      "test_mape": 5.116458237171173,
+      "test_r2": 0.7412213755939114,
+      "test_mape_stored": null,
+      "n_negative_predictions": null,
+      "init": "keras"
+    },
+    "delta_test_mape": 0.07968023419380188,
+    "delta_test_r2": 0.0009779406879055763,
+    "verdict": "Pass"
+  },
+  "plateau": {
+    "tf_exits": [
+      6,
+      4,
+      11
+    ],
+    "pytorch_exits": [
+      20,
+      7,
+      13
+    ],
+    "tf_stuck": [],
+    "pytorch_stopped_on_plateau": [],
+    "tf_stopped_on_plateau": [],
+    "verdict": "Fail"
+  }
+}

@@ -321,6 +321,24 @@ replay +0.59); (iii) test MAPE at early stopping (5.037; PyTorch exact replay 3.
   PyTorch agrees with TF, and the cause is diagnosed before the verdict stands.
 - **Inconclusive** otherwise, reported as such.
 
+**Result — Confirmed.** The setup check reproduced the ground truth's epoch-0 row bit for bit (all
+22 values). With one intra-op thread, TF then left the plateau one epoch earlier, trained 94 epochs
+instead of 45 and ended in a better basin:
+
+| run | epochs | (i) plateau exit | (ii) best val ≤ epoch 44 | Δ(ii) | best val | (iii) test MAPE | Δ(iii) | test R² |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| TF ground truth (4 threads) | 45 | 6 | 7.0663 | — | 7.0663 | 5.037 | — | 0.7402 |
+| **TF, one intra-op thread** | 94 | 5 | 7.0049 | −0.061 | 5.5902 | 3.668 | −1.369 | 0.8148 |
+| PyTorch exact replay (§5) | 152 | 2 | 7.6533 | +0.587 | 4.9780 | 3.045 | −1.992 | 0.8465 |
+
+The rule is met through (iii): changing only its thread count moved TF's own converged test MAPE by
+−1.37 points, in the same direction and of the same order as the PyTorch exact replay's −1.99. The
+delay replay's "better than TF" endpoint is TF-sized noise. On (ii) alone TF moved only −0.06
+against PyTorch's +0.59, so this run does not account for §5's equal-budget gap — but across the
+PyTorch runs that quantity itself ranges from +0.03 (§7.3) to +0.78 (§5, torch init), so it is not a
+stable property of the framework either. Report:
+[`pytorch_version_results/verification/reliability_report.md`](pytorch_version_results/verification/reliability_report.md).
+
 ### 7.3 The new default pipeline, trained to convergence
 
 Run: `experiment.py` with its defaults — `init=keras` drawn by PyTorch's RNG, PyTorch's own shuffle,
@@ -328,6 +346,11 @@ no TF input — on the ground truth's converged config, `trex_multiburst`/delay/
 
 - **Pass** if test MAPE is within ±1 point and R² within ±0.03 of the ground truth. A result outside
   that band passes only if §7.2 shows TF itself moving that far.
+
+**Result — Pass.** With no TF input at all, the default pipeline trained 57 epochs to early
+stopping: test MAPE **5.116** (TF 5.037, Δ +0.08), R² **0.7412** (TF 0.7402, Δ +0.001), best
+validation loss within TF's 45 epochs 7.097 (TF 7.066). It left the plateau late (epoch 20, §7.4)
+and still reached TF's accuracy.
 
 ### 7.4 Plateau test across seeds
 
@@ -337,6 +360,46 @@ and in PyTorch with the new default; seed 1 comes from the ground truth and from
 - **Pass** if no PyTorch run is early-stopped on the plateau and none leaves it more than 5 epochs
   after the latest TF seed. A TF seed that stays on the plateau itself is recorded as a property of
   the original model, and PyTorch is judged against it.
+
+**Result — Fail.**
+
+| seed | TF: plateau exit | PyTorch (new default): plateau exit |
+|--:|--:|--:|
+| 1 | 6 | **20** |
+| 2 | 4 | 7 |
+| 3 | 11 | 13 |
+
+PyTorch seed 1 left the plateau 9 epochs after the latest TF seed (11), beyond the 5 allowed; seeds 2
+and 3 are within the bound, and no run was early-stopped on the plateau (seed 1's early-stopping
+counter peaked at 11 of 15). TF seed 3 shows that TF's own plateaus can last 11 epochs. Diagnosis in
+§7.4a; a follow-up test with more draws in §7.6.
+
+### 7.4a Diagnosis of the late plateau exits
+
+**What the plateau is.** At initialisation the readout's occupancy output is O(1) while link
+capacities are ~1e9–1e10 bit/s, so the queueing term Σ occupancy/capacity is ~1e-6 of the target and
+the prediction is the transmission delay alone: val MAPE ≈ 86.7, whatever the weights. Every
+initialisation tested has the same step-0 loss (115.266 on 12 training scenarios,
+`pytorch_version_results/verification/scripts/diag_init_stats.py`), and two differently initialised PyTorch seed-1 runs have identical
+per-step losses on the plateau. Leaving it means growing the occupancy output by orders of magnitude.
+
+**What decides when.** A 2×2 cross-over on seed 1 (`pytorch_version_results/verification/scripts/run_diag_order_swap.sh`; 25-epoch runs,
+stopped after the exit) swaps the initial weights and the scenario order + z-scores independently:
+
+| initial weights \ scenario order | TF's | PyTorch's |
+|---|--:|--:|
+| TF-drawn | 2 (PyTorch), 5 and 6 (TF) | 7 |
+| PyTorch-drawn, Keras scheme | 13 | 20 |
+| PyTorch-drawn, PyTorch scheme | — | 20 |
+
+The initial weights explain most of it; the order shifts the exit by a few epochs. Not involved: the
+z-scores (all runs within ~1 % of each other), the init *scheme* (PyTorch's own and the Keras scheme
+leave at the same epoch from the same seed and order), and the shuffle algorithm (the same as
+tf.data's). The 2026-09-28 explanation — PyTorch's init scheme causes the late exit — was therefore
+wrong; switching the default to the Keras scheme is harmless (it is TF's scheme) but did not change
+the exit. Left open at this point: PyTorch-drawn weights (exits 7, 13, 20) looked slower than
+TF-drawn ones (2–7, 4, 11) although their distributions match tensor by tensor (§7.1). §7.6 tests
+whether that is chance.
 
 ### 7.5 Re-checks in today's environment
 
