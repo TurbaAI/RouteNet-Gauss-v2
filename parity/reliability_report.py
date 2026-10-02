@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Reliability verification report (PYTORCH_PARITY.md §7): applies the rules that were fixed
 # before the runs to whatever results exist, and says which checks are still pending.
 #

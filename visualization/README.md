@@ -20,7 +20,7 @@ Given one raw sample from a RouteNet-Gauss dataset (as returned by `utils.load_d
    when that can be determined), edges colored by link capacity with a colorbar, dashed edges
    for links whose destination couldn't be resolved from routing data (see "Diagnostics" below).
 3. Writes a text summary: node/link/flow counts, link capacity stats (min/max/mean, Gbps), the
-   `buffer_type` (queue discipline) distribution, path-length stats, and:
+   `buffer_type` (device type: router / switch / traffic generator) distribution, path-length stats, and:
    - a **traffic matrix** — offered traffic per (flow origin node → flow's last modeled hop),
      summed over all time windows, plus the largest source/destination;
    - **offered traffic & load** — per-flow traffic, packet rate and packet size stats, per-link

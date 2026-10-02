@@ -216,6 +216,7 @@ def parse_args():
     return p.parse_args()
 
 
+# ARCH: matrix — 2 datasets x 2 targets x 2 seeds, one experiment.py subprocess per cell
 def main():
     args = parse_args()
     #TF: use_gpu = detect_gpu(args.force_cpu)

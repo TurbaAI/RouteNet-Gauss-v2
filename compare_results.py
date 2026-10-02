@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Compare PyTorch experiment results with the frozen TensorFlow ground truth, cell by cell
 # ("cell" = dataset x target x seed), and emit Markdown tables for PYTORCH_PARITY.md.
 #

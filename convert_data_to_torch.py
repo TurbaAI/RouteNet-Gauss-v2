@@ -143,6 +143,7 @@ def numeric_shards(part_dir):
     return sorted((d for d in os.listdir(part_dir) if d.isdigit() and os.path.isdir(os.path.join(part_dir, d))), key=int)
 
 
+# ARCH: data-conversion — every TF shard of a partition -> <k>.pt.gz, re-read and compared
 def convert_partition(dataset, partition, args, log):
     src_part = os.path.join(args.data_path, dataset, partition)
     dst_part = os.path.join(args.out_path, dataset, partition)

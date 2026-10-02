@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Verifies the one part of evaluation_torch.ipynb that the L0/L1 harness does NOT cover:
 # `concatenate_ds_with_donor_mask`, which builds the OMNeT++ ("simulated") column by selecting
 # windows of the *_simulated test set with the flow_has_<metric> mask of the *testbed* set.

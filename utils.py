@@ -45,6 +45,7 @@ from typing import List
 from torch_ragged import decode_sample
 
 
+# ARCH: targets-mask — [F, W, ...] -> window-major [W*F, ...], the order targets and predictions share
 def seg_to_global_reshape(tensor, num_dims=3):
     assert num_dims > 1
     perms = [1, 0] + list(range(2, num_dims))
@@ -59,6 +60,7 @@ def seg_to_global_reshape(tensor, num_dims=3):
     return tensor.permute(*perms).reshape(new_shape)
 
 
+# ARCH: targets-mask — y becomes the five targets of the (flow, window) pairs where `mask` holds
 def prepare_targets_and_mask(targets: List[str], mask: str) -> callable:
     """Obtains map function to prepare the targets of the dataset for the current model.
 
@@ -101,6 +103,7 @@ def prepare_targets_and_mask(targets: List[str], mask: str) -> callable:
     return modified_target_map
 
 
+# ARCH: data-loading — in-memory stand-in for the tf.data.Dataset chains
 class ListDataset:
     """Minimal in-memory stand-in for the tf.data.Dataset chains used by this repo.
 
@@ -129,6 +132,7 @@ class ListDataset:
     def map(self, fn):
         return self._clone(map_fns=self._map_fns + (fn,))
 
+    # ARCH: shuffle — tf.data's buffered shuffle, one seeded generator shared by all iterators
     def shuffle(self, buffer_size, seed=None, reshuffle_each_iteration=True):
         assert reshuffle_each_iteration, "only reshuffle_each_iteration=True is implemented (tf.data default)"
         gen = torch.Generator()
@@ -200,6 +204,7 @@ class ListDataset:
                 out = buf.pop(j)
             yield out
 
+    # ARCH: shuffle — the training order (sample_idx per step), saved as sample_order_used.npy
     def index_order(self, n):
         """sample_idx of the first n elements this dataset would emit (consumes the shared
         shuffle stream exactly like iterating would). Used by experiment.py to materialise
@@ -231,6 +236,7 @@ def _load_shard(path):
     return [(decode_sample(s["x"]), s["y"]) for s in payload["samples"]]
 
 
+# ARCH: data-loading — all shards of data_torch/<dataset>/<partition> as one ListDataset
 #TF: def load_dataset(name: str, data_path: str = "data") -> tf.data.Dataset:
 def load_dataset(name: str, data_path: str = "data_torch") -> ListDataset:
     """Function to unshard and load a dataset from the data folder.

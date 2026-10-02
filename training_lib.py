@@ -36,6 +36,7 @@ import numpy as np
 import torch
 
 
+# ARCH: z-scores — mean/std of the traffic features over the first 500 shuffled scenarios
 def get_z_scores_dict(
     ds,
     params,
@@ -125,6 +126,7 @@ def get_z_scores_dict(
     return scores
 
 
+# ARCH: metrics — MAPE and R2 of each of the five outputs
 def get_positional_mape(pos: int, name: str) -> callable:
     """Returns the MAPE metric for a specific feature at a given position.
 
@@ -234,6 +236,7 @@ class LearningRateLogger:
 KERAS_EPSILON = 1e-7  # tf.keras.backend.epsilon()
 
 
+# ARCH: loss — Keras' MAPE over a scenario's (flow, window) predictions
 def keras_mape_loss(y_true: torch.Tensor, y_pred: torch.Tensor) -> torch.Tensor:
     """tf.keras.losses.MeanAbsolutePercentageError():
         100 * mean(|y_true - y_pred| / max(|y_true|, epsilon))
@@ -244,6 +247,7 @@ def keras_mape_loss(y_true: torch.Tensor, y_pred: torch.Tensor) -> torch.Tensor:
     return 100.0 * torch.mean(diff)
 
 
+# ARCH: optimizer — Keras clipnorm: every gradient tensor clipped separately
 def clip_by_norm_(grads, clipnorm: float) -> None:
     """Keras `Optimizer(clipnorm=c)`: EVERY gradient tensor is clipped separately to L2 norm
     <= c (tf.clip_by_norm per tensor). This is NOT torch.nn.utils.clip_grad_norm_, which
@@ -256,6 +260,7 @@ def clip_by_norm_(grads, clipnorm: float) -> None:
         g.mul_(clipnorm).div_(torch.maximum(norm, torch.full_like(norm, clipnorm)))
 
 
+# ARCH: optimizer — Adam with Keras' arithmetic
 class KerasAdam(torch.optim.Optimizer):
     """Adam with exactly the arithmetic of tf.keras.optimizers.Adam (Keras 2.15):
 
@@ -350,6 +355,7 @@ import math
 import time
 
 
+# ARCH: callbacks — checkpoint every epoch (or on improvement)
 class KerasModelCheckpoint:
     """tf.keras.callbacks.ModelCheckpoint(save_weights_only=True, monitor='val_loss', mode='min',
     save_freq='epoch'): saves `{epoch:02d}-{val_loss:.4f}.pt` (epoch is 1-based) every epoch, or
@@ -383,6 +389,7 @@ class KerasModelCheckpoint:
         self.best = st["best"]
 
 
+# ARCH: callbacks — halve the learning rate when the training loss stalls
 class KerasReduceLROnPlateau:
     """tf.keras.callbacks.ReduceLROnPlateau(factor, patience, verbose, cooldown, mode='min',
     monitor, min_delta=1e-4, min_lr=0) — Keras 2.15 on_epoch_end logic, verbatim."""
@@ -432,6 +439,7 @@ class KerasReduceLROnPlateau:
         self.best, self.cooldown_counter, self.wait = st["best"], st["cooldown_counter"], st["wait"]
 
 
+# ARCH: callbacks — early stopping on val_loss, best weights restored
 class KerasEarlyStopping:
     """tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience, restore_best_weights=True,
     start_from_epoch, min_delta=0, mode='min') — Keras 2.15 logic, verbatim (epoch is 0-based)."""
@@ -483,6 +491,7 @@ def load_resume_state(resume_path):
     return None
 
 
+# ARCH: training-loop — Keras' model.fit written out: steps, validation, callbacks, resume.pt
 def fit(
     model,
     optimizer,

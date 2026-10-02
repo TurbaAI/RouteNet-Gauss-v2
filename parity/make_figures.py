@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Figures for PYTORCH_PARITY.md. Each answers one question:
 #
 #   fig1_converged_curves.png   Do the converged runs follow the same learning trajectory?

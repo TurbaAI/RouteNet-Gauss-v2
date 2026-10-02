@@ -98,10 +98,10 @@ carry information the model never sees, which is where most of the "extra" signa
 | field | used by model | meaning |
 |---|---|---|
 | `link_capacity` | yes | Link capacity in **Gbps** (`models.py` multiplies by `1e9` to get bit/s). |
-| `link_pkt_header_size` | yes | L1/L2 framing overhead in bytes added per packet, folded into the load calculation. |
+| `link_pkt_header_size` | yes | L1/L2 framing overhead per packet in **bits** (304 or 336, i.e. 38 or 42 bytes), folded into the load calculation. |
 | `link_r_capacity`, `link_s_capacity` | yes | Per-tier capacities, used when the unified `link_capacity` is absent. |
 | `link_r_pkt_header_size`, `link_s_pkt_header_size` | yes | Per-tier header sizes, same fallback. |
-| `buffer_type` | yes | Per **queue**, a categorical buffer/scheduling class in `{0,1,2}` (`max_buffer_types = 3`). This is the *only* queue-configuration field — there is no continuous buffer-size field. |
+| `buffer_type` | yes | Per **queue**, the **type of the queue's device**: 0 router, 1 switch, 2 traffic generator (`max_buffer_types = 3`; the paper's *Device type*, see `ARCHITECTURE.md` §10.2). It is the *only* queue-configuration field — there is no buffer-size field. |
 
 ### Per-flow traffic inputs
 

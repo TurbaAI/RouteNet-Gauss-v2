@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Run parity/l0_forward.py for every TF checkpoint in the repo (2 converged GT, 8 quick-baseline
 # GT, 6 paper weights) on its test set, each in its own process, and summarise the JSON reports
 # into pytorch_version_results/parity/l0_summary.{json,md}.

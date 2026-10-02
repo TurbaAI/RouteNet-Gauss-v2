@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # L1 parity check: loss, gradients and one optimizer step, TensorFlow (tf_reference/) versus
 # PyTorch (models.py + training_lib.py), from IDENTICAL weights on IDENTICAL scenarios.
 #

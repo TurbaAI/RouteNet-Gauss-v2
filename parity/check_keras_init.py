@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Keras-init check: does PyTorch's `RouteNetGauss(init="keras")` (models.init_keras_style_) draw
 # its initial weights from the same distributions as the Keras initialisers of the TF original?
 #

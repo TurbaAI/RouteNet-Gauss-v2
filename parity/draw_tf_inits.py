@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Draw TensorFlow's own initial weights of RouteNet-Gauss for any seed (PYTORCH_PARITY.md §7.6).
 #
 # Follows the replay recorder's path to its init dump exactly (tf_reference/replay_tf_run.py

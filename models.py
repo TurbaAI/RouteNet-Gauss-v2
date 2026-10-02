@@ -21,6 +21,9 @@ limitations under the License.
 # unchanged. The frozen TF original is importable as `tf_reference.models`. See
 # PYTORCH_PORT.md for the op-by-op mapping and the list of semantic differences, and
 # torch_ragged.py for the tf.RaggedTensor stand-ins used here (Ragged, ragged_gather, ...).
+#
+# Architecture: ARCHITECTURE.md explains this model with its equations. Each `# ARCH: <id>`
+# comment below marks the code of one architecture element; the id is an anchor in that file.
 
 #TF: import tensorflow as tf
 import torch
@@ -36,6 +39,7 @@ from torch_ragged import (
 )
 
 
+# ARCH: init — Keras-style initialisation (the default)
 def init_keras_style_(module: nn.Module) -> None:
     """Re-initialise `module` in place with the Keras defaults RouteNet-Gauss was trained
     with: glorot-uniform kernels (Dense and GRU input kernels), orthogonal GRU recurrent
@@ -61,6 +65,7 @@ def init_keras_style_(module: nn.Module) -> None:
             nn.init.zeros_(m.bias_hh_l0)
 
 
+# ARCH: model — the nine building blocks (E_f, E_l, E_q, E_d, U_F, U_Q, U_L, U_D, R) and forward()
 #TF: class RouteNetGauss(tf.keras.Model):
 class RouteNetGauss(nn.Module):
     z_scores_fields = {
@@ -165,22 +170,26 @@ class RouteNetGauss(nn.Module):
         # call(), i.e. run along each flow's hop sequence; torch's sequence form of the same
         # cell is nn.GRU (one layer, batch_first). Its parameters (weight_ih_l0, ...) have the
         # GRUCell layout, so the TF->torch weight mapping is the same as for the other cells.
+        # ARCH: flow-update — U_F: input [queue state ‖ link state] per hop, flow state
         #TF: self.flow_update = tf.keras.layers.GRUCell(
         #TF:     self.flow_state_dim, name="PathUpdate"
         #TF: )
         self.flow_update = nn.GRU(
             self.queue_state_dim + self.link_state_dim, self.flow_state_dim, batch_first=True
         )
+        # ARCH: link-update — U_L: input its queue's state, link state
         #TF: self.link_update = tf.keras.layers.GRUCell(
         #TF:     self.link_state_dim, name="LinkUpdate"
         #TF: )
         self.link_update = nn.GRUCell(self.queue_state_dim, self.link_state_dim)
+        # ARCH: queue-update — U_Q: input [sum of flow states ‖ device state], queue state
         #TF: self.queue_update = tf.keras.layers.GRUCell(
         #TF:     self.queue_state_dim, name="QueueUpdate"
         #TF: )
         self.queue_update = nn.GRUCell(
             self.flow_state_dim + self.node_state_dim, self.queue_state_dim
         )
+        # ARCH: device-update — U_D: input sum of its queues' states, device ("node") state
         #TF: self.node_update = tf.keras.layers.GRUCell(
         #TF:     self.node_state_dim, name="NodeUpdate"
         #TF: )
@@ -189,6 +198,7 @@ class RouteNetGauss(nn.Module):
         # Embedding functions
         # PyTorch: nn.Sequential has no Input layer; Keras Dense(units, activation=relu) is
         # nn.Linear followed by nn.ReLU, so TF layer_with_weights-k is index 2k here.
+        # ARCH: flow-encoder — E_f: [z(traffic), z(packet rate), active flag] -> flow state
         #TF: self.flow_embedding = tf.keras.Sequential(
         #TF:     [
         #TF:         tf.keras.layers.Input(shape=(None, 3)),
@@ -207,6 +217,7 @@ class RouteNetGauss(nn.Module):
             nn.Linear(self.flow_state_dim, self.flow_state_dim),
             nn.ReLU(),
         )
+        # ARCH: queue-encoder — E_q: one-hot device type (`buffer_type`) -> queue state
         #TF: self.queue_embedding = tf.keras.Sequential(
         #TF:     [
         #TF:         tf.keras.layers.Input(shape=self.max_buffer_types),
@@ -225,6 +236,7 @@ class RouteNetGauss(nn.Module):
             nn.Linear(self.queue_state_dim, self.queue_state_dim),
             nn.ReLU(),
         )
+        # ARCH: link-encoder — E_l: link load -> link state
         #TF: self.link_embedding = tf.keras.Sequential(
         #TF:     [
         #TF:         tf.keras.layers.Input(shape=(None, 1)),
@@ -243,6 +255,7 @@ class RouteNetGauss(nn.Module):
             nn.Linear(self.link_state_dim, self.link_state_dim),
             nn.ReLU(),
         )
+        # ARCH: device-encoder — E_d: sum of its queues' states -> device ("node") state
         #TF: self.node_embedding = tf.keras.Sequential(
         #TF:     [
         #TF:         tf.keras.layers.Input(shape=self.queue_state_dim),
@@ -262,6 +275,7 @@ class RouteNetGauss(nn.Module):
             nn.ReLU(),
         )
 
+        # ARCH: readout — R: per-hop flow state -> occupancy (one value per output)
         #TF: self.readout_path = tf.keras.Sequential(
         #TF:     [
         #TF:         tf.keras.layers.Input(shape=(None, self.flow_state_dim)),
@@ -320,6 +334,7 @@ class RouteNetGauss(nn.Module):
         #TF: length = tf.squeeze(inputs["flow_length"], 1)
         length = inputs["flow_length"].squeeze(1)
         flow_has_traffic = inputs["flow_has_traffic"]
+        # ARCH: flow-encoder — h_f for every window: E_f([z(traffic), z(packet rate), active])
         # We apply the transpose so the first dimension are the segments, the second the
         # flows
         #TF: initial_flow_state = tf.transpose(
@@ -348,6 +363,8 @@ class RouteNetGauss(nn.Module):
             ),
         ).permute(1, 0, 2)
 
+        # ARCH: link-encoder — load per link and window: sum over crossing flows of
+        # (traffic + packet rate * header bits) / capacity, then h_l = E_l(load)
         # Calculate load per link per window, including packet size correction due to
         # l1 and l2 headers size
         if "link_capacity" not in inputs:
@@ -396,6 +413,7 @@ class RouteNetGauss(nn.Module):
         #TF: initial_link_state = tf.transpose(self.link_embedding(load), [1, 0, 2])
         initial_link_state = self.link_embedding(load).permute(1, 0, 2)
 
+        # ARCH: queue-encoder — h_q = E_q(one-hot device type), once; carried across windows
         # Queue_state and node states are related to memory buffers, these are the
         # states that are kept between windows
         buffer_type = inputs["buffer_type"]
@@ -405,6 +423,7 @@ class RouteNetGauss(nn.Module):
         queue_state = self.queue_embedding(
             torch.nn.functional.one_hot(buffer_type.long(), self.max_buffer_types).squeeze(1).to(torch.get_default_dtype())
         )
+        # ARCH: device-encoder — h_d = E_d(sum of its queues' states), once; carried across windows
         #TF: node_state = self.node_embedding(
         #TF:     tf.math.reduce_sum(
         #TF:         tf.gather(queue_state, node_groupings),
@@ -426,6 +445,8 @@ class RouteNetGauss(nn.Module):
             torch.zeros((int(length.sum()), self.flow_state_dim), device=device), length
         )
 
+        # ARCH: window-loop — one pass per window (TAPE): flows and links re-encoded,
+        # queue_state / node_state carried over from the previous window
         #TF: for curr_seg in range(inputs["seg_num"]):
         for curr_seg in range(seg_num):
             # PyTorch: autograph loop hints have no equivalent (plain Python loop).
@@ -443,12 +464,15 @@ class RouteNetGauss(nn.Module):
             flow_state = initial_flow_state[curr_seg]
             link_state = initial_link_state[curr_seg]
 
+            # ARCH: mp-loop — T iterations, each updating flows -> queues -> links -> devices
             # Iterate t times doing the message passing
             for it in range(self.iterations):
                 ###################
                 #  LINK AND QUEUE #
                 #     TO PATH     #
                 ###################
+                # ARCH: flow-update — U_F along each path; flow_state_sequence keeps the flow's
+                # state on arrival at every hop (position 0) and after it (positions 1..n_f)
                 #TF: queue_gather = tf.gather(queue_state, queue_to_path)
                 queue_gather = ragged_gather(queue_state, queue_to_path)
                 #TF: link_gather = tf.gather(link_state, link_to_path, name="LinkToPath")
@@ -484,6 +508,7 @@ class RouteNetGauss(nn.Module):
                 #  PATH AND NODE  #
                 #    TO QUEUE     #
                 ###################
+                # ARCH: queue-update — U_Q([sum of crossing flows' states on arrival ‖ device state])
                 #TF: flow_gather = tf.gather_nd(flow_state_sequence, flow_to_queue)
                 flow_gather = ragged_gather_nd(flow_state_sequence.to_padded(), flow_to_queue)
                 #TF: flow_sum = tf.math.reduce_sum(flow_gather, axis=1)
@@ -503,6 +528,7 @@ class RouteNetGauss(nn.Module):
                 ###################
                 #  QUEUE TO LINK  #
                 ###################
+                # ARCH: link-update — U_L(its queue's new state)
                 #TF: queue_gather = tf.gather(queue_state, queue_to_link)
                 queue_gather = queue_state[queue_to_link]
 
@@ -517,6 +543,7 @@ class RouteNetGauss(nn.Module):
                 ###################
                 #  QUEUE TO NODE  #
                 ###################
+                # ARCH: device-update — U_D(sum of its queues' new states)
                 #TF: node_state, _ = self.node_update(
                 #TF:     tf.math.reduce_sum(
                 #TF:         tf.gather(queue_state, node_groupings),
@@ -536,6 +563,8 @@ class RouteNetGauss(nn.Module):
             # MESSAGE PASSING #
             #       END       #
             ###################
+            # ARCH: readout — occupancy R(state after each hop) / capacity, summed along the path,
+            # + transmission delay (delay model); clamped at inference; masked to valid windows
             # Readout and delay prediction
             #TF: capacity_gather = tf.gather(capacity, link_to_path)
             capacity_gather = ragged_gather(capacity, link_to_path)

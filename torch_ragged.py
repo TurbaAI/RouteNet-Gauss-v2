@@ -30,6 +30,8 @@ limitations under the License.
 # gathers/sums over flat values), so this avoids re-deriving the same tensors hundreds of
 # times per scenario. All operations are ordinary autograd-friendly tensor code and
 # deterministic on CPU and (with torch.use_deterministic_algorithms(True)) on CUDA.
+#
+# ARCH: ragged — ragged tensors and the six operations the model uses (ARCHITECTURE.md)
 
 from __future__ import annotations
 
@@ -226,6 +228,7 @@ def ragged_prepend(first: Tensor, r: Ragged) -> Ragged:
                   n_values=r.n_values + r.nrows)
 
 
+# ARCH: flow-update — U_F run along every flow's path at once (padded, causal)
 def run_gru_over_ragged(gru: torch.nn.GRU, inputs: Ragged, initial_state: Tensor) -> Tuple[Ragged, Tensor]:
     """tf.keras.layers.RNN(cell, return_sequences=True, return_state=True)(ragged_inputs,
     initial_state=...): run the GRU along every row's sequence (rows are the batch).

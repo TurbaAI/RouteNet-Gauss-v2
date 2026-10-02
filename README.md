@@ -83,6 +83,27 @@ for PyTorch), [`evaluation_torch.ipynb`](evaluation_torch.ipynb), `torch_ragged.
 converters, `parity/`, `tf_reference/`, `tensorflow_version_gt/` and `pytorch_version_results/`
 (see [PyTorch port](#pytorch-port)).
 
+## Architecture
+
+RouteNet-Gauss builds an expanded graph of each network scenario — its flows, links, queues and
+devices — encodes every element, lets them exchange messages for 8 iterations in every time window
+(queues and devices carry their state from one window to the next), and reads each flow's delay or
+jitter out of its per-hop states as occupancy divided by link capacity.
+
+```mermaid
+flowchart LR
+  IN["scenario<br/>flows, links, queues, devices,<br/>W time windows"] --> ENC["encoders<br/>E_f · E_l · E_q · E_d"]
+  ENC --> MP["message passing, 8 iterations per window<br/>flows → queues → links → devices"]
+  MP -->|"queue and device states<br/>carried to the next window"| MP
+  MP --> RO["readout per hop<br/>occupancy ÷ capacity, summed along the path"]
+  RO --> OUT["delay or jitter per flow and window<br/>mean, p50, p90, p95, p99"]
+```
+
+**[ARCHITECTURE.md](ARCHITECTURE.md)** explains the model with its equations, the data and training
+pipeline around it, how the code differs from the paper, and where to change what. Every element
+there names the code that implements it, and the code points back with `# ARCH: <id>` comments;
+`python parity/check_architecture.py` checks that both directions still resolve.
+
 ## Datasets information
 
 In the `data` folder, we can find all the variants of the three datasets used in the paper. Inside each directory, data is split according to the training, validation, and test splits. Then each partition is subdivided into shards, to keep the repository's file size under git and GitHub's limits. *NOTE*: please use the `load_dataset` function from `utils.py` to load these shards correctly. The datasets go as follows:

@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # L0 parity check: forward pass of the frozen TensorFlow RouteNetGauss (tf_reference/) versus
 # the PyTorch RouteNetGauss (models.py) with IDENTICAL weights on IDENTICAL scenarios.
 #

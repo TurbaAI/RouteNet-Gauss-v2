@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+# ARCH: verification — a parity tool of the verification layer (ARCHITECTURE.md)
+#
 # Evaluate a saved PyTorch checkpoint on a dataset's test split, writing the same
 # metrics.json / predictions.npz that experiment.py writes at the end of training.
 #

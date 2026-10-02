@@ -71,6 +71,7 @@ def reorder_gates(x: np.ndarray) -> np.ndarray:
     return np.concatenate([x[..., H : 2 * H], x[..., 0:H], x[..., 2 * H : 3 * H]], axis=-1)
 
 
+# ARCH: weight-conversion — TF tensors -> torch state_dict (transpose, GRU gate reorder)
 def tf_arrays_to_state_dict(arrays: dict) -> dict:
     """arrays: {tf_name: np.ndarray} with the 34 RouteNet-Gauss weight tensors."""
     sd = {}

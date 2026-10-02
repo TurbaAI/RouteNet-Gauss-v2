@@ -204,6 +204,7 @@ def parse_args():
     return p.parse_args()
 
 
+# ARCH: job — one cell: data -> z-scores -> model -> fit -> test evaluation -> outputs
 def main():
     args = parse_args()
     if args.replay_from:
@@ -409,6 +410,7 @@ def main():
     tb_writer.close()
     history = {"loss": [r["loss"] for r in history_rows], "val_loss": [r["val_loss"] for r in history_rows]}
 
+    # ARCH: test-eval — clamped predictions on the test split -> metrics.json, predictions.npz
     # --- Evaluate on the test split ---
     ds_test = load_dataset(f"{args.dataset}/test", data_path=args.data_path).map(
         prepare_targets_and_mask(targets, mask)

@@ -19,6 +19,8 @@ limitations under the License.
 # training_lib.fit (Keras-exact loop, see experiment.py / PYTORCH_PORT.md). Run from the repo
 # root:  python train.py            (conda env RG_torch)
 #
+# ARCH: paper-config — the paper's single-run configuration (ARCHITECTURE.md)
+#
 # Two deliberate differences from the TF script: (1) `experiment_name` defaults to
 # "torch_train" — the TF default "paper_weights" made a plain `python train.py` write epoch
 # checkpoints into ckpt/paper_weights/, on top of the shipped paper weights; (2) the device is
